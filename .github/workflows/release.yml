@@ -1,0 +1,115 @@
+name: Build and Release
+
+# Workflow berjalan ketika kita push tag
+#
+# Contoh:
+# git tag v1.0.0
+# git push origin v1.0.0
+#
+on:
+  push:
+    tags:
+      - "v*"
+
+# Permission agar GitHub Actions
+# bisa membuat GitHub Release
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # STEP 1 — Checkout source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          # Ambil semua commit dan tag,
+          # dibutuhkan untuk membuat release notes
+          fetch-depth: 0
+
+      # STEP 2 — Install Java 21
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      # STEP 3 — Build Spring Boot
+      - name: Build Spring Boot
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      # STEP 4 — Siapkan nama JAR
+      - name: Prepare JAR
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+
+          JAR_FILE=$(find target \
+            -maxdepth 1 \
+            -type f \
+            -name "*.jar" \
+            | head -n 1)
+
+          if [ -z "$JAR_FILE" ]; then
+            echo "JAR tidak ditemukan!"
+            exit 1
+          fi
+
+          RELEASE_JAR="spring-app-${VERSION}.jar"
+          cp "$JAR_FILE" "target/${RELEASE_JAR}"
+
+          echo "JAR berhasil dibuat:"
+          ls -lh "target/${RELEASE_JAR}"
+
+      # STEP 5 — Buat Release Notes
+      - name: Generate Release Notes
+        run: |
+          CURRENT_TAG=${GITHUB_REF_NAME}
+
+          PREVIOUS_TAG=$(git tag --sort=-version:refname \
+            | grep -v "^${CURRENT_TAG}$" \
+            | head -n 1)
+
+          echo "Tag sekarang   : ${CURRENT_TAG}"
+          echo "Tag sebelumnya : ${PREVIOUS_TAG}"
+
+          echo "# Release ${CURRENT_TAG}" > release-notes.md
+          echo "" >> release-notes.md
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "## Changes" >> release-notes.md
+            echo "" >> release-notes.md
+            git log "${PREVIOUS_TAG}..${CURRENT_TAG}" \
+              --pretty=format:"- \`%h\` %s — **%an**" \
+              >> release-notes.md
+          else
+            echo "## Changes" >> release-notes.md
+            echo "" >> release-notes.md
+            git log "${CURRENT_TAG}" \
+              --pretty=format:"- \`%h\` %s — **%an**" \
+              >> release-notes.md
+          fi
+
+          echo "" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "## Build Information" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "- Java: Eclipse Temurin 21" >> release-notes.md
+          echo "- Build: Maven" >> release-notes.md
+          echo "- Tests: Skipped" >> release-notes.md
+
+          cat release-notes.md
+
+      # STEP 6 — Buat GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: target/spring-app-${{ github.ref_name }}.jar
+          generate_release_notes: false

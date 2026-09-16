@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <th:block th:fragment="sidebar(halamanAktif)">
+        <div class="bar-mobile-atas">
+            <button type="button" class="tombol-menu-mobile" id="tombolBukaMobile" aria-label="Buka Menu" title="Buka Menu">
+                <i class="bx bx-menu"></i>
+            </button>
+            <a th:href="@{/dashboard}" class="tautan-brand-mobile">
+                <img th:src="@{/images/logo.png}" alt="SakuKita" class="logo-mobile" />
+            </a>
+            <div class="ruang-kosong-mobile"></div>
+        </div>
+
+        <div class="latar-belakang-mobile" id="latarMobile"></div>
+
+        <aside class="sidebar-kapsul" id="sidebarKapsul">
+            <div>
+                <div class="area-brand-kapsul">
+                    <a th:href="@{/dashboard}" class="tautan-brand-kapsul" id="tautanBrand">
+                        <img th:src="@{/images/logo.png}" alt="SakuKita" class="logo-kapsul-panjang" id="logoPanjang" />
+                    </a>
+                    <button type="button" class="tombol-toggle-kapsul" id="tombolToggleSidebar" aria-label="Menu" title="Menu Sidebar">
+                        <i class="bx bx-menu"></i>
+                    </button>
+                </div>
+
+                <ul class="navigasi-kapsul">
+                    <li>
+                        <a th:href="@{/dashboard}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'dashboard'} ? 'menu-kapsul-aktif' : ''" title="Dashboard">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-home-circle"></i></span>
+                            <span class="teks-menu-kapsul">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/pemasukan}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'pemasukan'} ? 'menu-kapsul-aktif' : ''" title="Pemasukan">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-up-arrow-alt"></i></span>
+                            <span class="teks-menu-kapsul">Pemasukan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/pengeluaran}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'pengeluaran'} ? 'menu-kapsul-aktif' : ''" title="Pengeluaran">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-down-arrow-alt"></i></span>
+                            <span class="teks-menu-kapsul">Pengeluaran</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/kategori}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'kategori'} ? 'menu-kapsul-aktif' : ''" title="Kategori">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-grid-alt"></i></span>
+                            <span class="teks-menu-kapsul">Kategori</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/laporan}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'laporan'} ? 'menu-kapsul-aktif' : ''" title="Laporan">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-bar-chart-alt-2"></i></span>
+                            <span class="teks-menu-kapsul">Laporan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="area-keluar">
+                <a th:href="@{/logout}" class="tautan-menu-kapsul text-danger" title="Keluar">
+                    <span class="ikon-menu-kapsul"><i class="bx bx-power-off"></i></span>
+                    <span class="teks-menu-kapsul">Keluar</span>
+                </a>
+            </div>
+        </aside>
+
+        <script>
+            (function () {
+                const sidebar = document.getElementById('sidebarKapsul');
+                const tombolToggle = document.getElementById('tombolToggleSidebar');
+                const tombolBukaMobile = document.getElementById('tombolBukaMobile');
+                const latarMobile = document.getElementById('latarMobile');
+                const tautanBrand = document.getElementById('tautanBrand');
+                const teksMenu = document.querySelectorAll('.teks-menu-kapsul');
+                let isCollapsed = false;
+
+                function bukaSidebarMobile() {
+                    if (sidebar) sidebar.classList.add('sidebar-kapsul-terbuka-mobile');
+                    if (latarMobile) latarMobile.classList.add('latar-belakang-mobile-aktif');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function tutupSidebarMobile() {
+                    if (sidebar) sidebar.classList.remove('sidebar-kapsul-terbuka-mobile');
+                    if (latarMobile) latarMobile.classList.remove('latar-belakang-mobile-aktif');
+                    document.body.style.overflow = '';
+                }
+
+                if (tombolBukaMobile) {
+                    tombolBukaMobile.addEventListener('click', bukaSidebarMobile);
+                }
+
+                if (latarMobile) {
+                    latarMobile.addEventListener('click', tutupSidebarMobile);
+                }
+
+                if (tombolToggle && !tombolToggle.dataset.toggleInitialized) {
+                    tombolToggle.dataset.toggleInitialized = 'true';
+                    tombolToggle.addEventListener('click', function () {
+                        if (window.innerWidth < 992) {
+                            tutupSidebarMobile();
+                            return;
+                        }
+                        isCollapsed = !isCollapsed;
+                        if (isCollapsed) {
+                            sidebar.classList.add('sidebar-kapsul-ringkas');
+                            if (tautanBrand) tautanBrand.style.display = 'none';
+                            teksMenu.forEach(el => el.style.display = 'none');
+                            tombolToggle.setAttribute('title', 'Buka Menu');
+                        } else {
+                            sidebar.classList.remove('sidebar-kapsul-ringkas');
+                            if (tautanBrand) tautanBrand.style.display = 'flex';
+                            teksMenu.forEach(el => el.style.display = 'inline');
+                            tombolToggle.setAttribute('title', 'Tutup Menu');
+                        }
+                    });
+                }
+            })();
+        </script>
+    </th:block>
+</body>
+</html>

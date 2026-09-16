@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laporan Keuangan - SakuKita</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+    <link rel="stylesheet" th:href="@{/css/sakukita.css}" />
+</head>
+<body>
+    <div class="wadah-dashboard-utama">
+        <aside th:replace="~{fragments/sidebar :: sidebar('laporan')}"></aside>
+
+        <main class="area-konten-dashboard">
+            <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="h3 fw-bold text-dark mb-1">Laporan Keuangan</h2>
+                    <p class="text-muted small mb-0">Analisis tren arus kas dan pemakaian uang per kategori</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 dropdown-toggle d-flex align-items-center gap-1 fw-medium" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.85rem;">
+                            <i class="bx bx-calendar"></i>
+                            <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua' : 'Bulan Ini')}">Bulan Ini</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; min-width: 140px;">
+                            <li>
+                                <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'bulan' or periode == null} ? 'active' : ''" th:href="@{/laporan(periode='bulan')}">
+                                    <span>Bulan Ini</span>
+                                    <i th:if="${periode == 'bulan' or periode == null}" class="bx bx-check"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'tahun'} ? 'active' : ''" th:href="@{/laporan(periode='tahun')}">
+                                    <span>Tahun Ini</span>
+                                    <i th:if="${periode == 'tahun'}" class="bx bx-check"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'semua'} ? 'active' : ''" th:href="@{/laporan(periode='semua')}">
+                                    <span>Semua</span>
+                                    <i th:if="${periode == 'semua'}" class="bx bx-check"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <section class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="kartu-metrik-ringkas">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small fw-semibold">TOTAL PEMASUKAN</span>
+                            <div class="lingkaran-ikon-hijau">
+                                <i class="bx bx-trending-up"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 th:text="'Rp ' + ${#numbers.formatDecimal(totalPemasukan != null ? totalPemasukan : 0, 0, 'POINT', 0, 'COMMA')}" class="display-6 fw-bold mb-3 angka-tabel text-dark">Rp 0</h2>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="lencana-metrik-hijau">
+                                    <i class="bx bx-up-arrow-alt"></i>
+                                    <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua Waktu' : 'Bulan Ini')}">Bulan Ini</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="kartu-metrik-ringkas">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small fw-semibold">TOTAL PENGELUARAN</span>
+                            <div class="lingkaran-ikon-merah">
+                                <i class="bx bx-trending-down"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 th:text="'Rp ' + ${#numbers.formatDecimal(totalPengeluaran != null ? totalPengeluaran : 0, 0, 'POINT', 0, 'COMMA')}" class="display-6 fw-bold mb-3 angka-tabel text-dark">Rp 0</h2>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="lencana-metrik-merah">
+                                    <i class="bx bx-down-arrow-alt"></i>
+                                    <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua Waktu' : 'Bulan Ini')}">Bulan Ini</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card kartu-konten h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold mb-0 text-dark">Pemasukan dan Pengeluaran 6 Bulan terakhir</h5>
+                                <small class="text-muted">Tren pemasukan dan pengeluaran riil</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="badge rounded-pill bg-label-success px-3 py-2 text-success">Pemasukan</span>
+                                <span class="badge rounded-pill bg-label-danger px-3 py-2 text-danger">Pengeluaran</span>
+                            </div>
+                        </div>
+                        <div id="grafikArusKas" style="min-height: 290px;"></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card kartu-konten h-100 p-4 d-flex flex-column justify-content-between">
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-0 text-dark">Pengelolaan uang sesuai kategori</h5>
+                            <small class="text-muted">Total transaksi per kategori</small>
+                        </div>
+                        <div id="grafikKategori" style="min-height: 220px;"></div>
+                        <ul class="list-unstyled mb-0 pt-3 border-top" style="max-height: 200px; overflow-y: auto;">
+                            <li th:each="item : ${alokasiKategori}" class="d-flex justify-content-between align-items-center py-1">
+                                <div class="d-flex align-items-center gap-2 text-truncate pe-2">
+                                    <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px;" th:styleappend="'background-color: ' + ${item.warna}"></span>
+                                    <span class="small text-truncate" th:text="${item.nama}">Kategori</span>
+                                </div>
+                                <span class="small fw-bold angka-tabel flex-shrink-0" th:text="'Rp ' + ${#numbers.formatDecimal(item.total != null ? item.total : 0, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                            </li>
+                            <li th:if="${alokasiKategori == null or #lists.isEmpty(alokasiKategori)}" class="text-center py-3 text-muted small">
+                                Belum ada kategori yang tersedia. <a th:href="@{/kategori}" class="fw-semibold text-decoration-none" style="color: #0F3D32;">Buat kategori</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="text-center py-3 text-muted small border-top mt-4">
+                © 2026 SakuKita &bull; Solusi Literasi & Pengelolaan Finansial Cerdas.
+            </footer>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script th:src="@{/assets/vendor/libs/apex-charts/apexcharts.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const elGrafikArusKas = document.querySelector('#grafikArusKas');
+            if (elGrafikArusKas) {
+                const bulanLabels = /*[[${arusKasBulan}]]*/ [];
+                const dataMasuk = /*[[${arusKasPemasukan}]]*/ [];
+                const dataKeluar = /*[[${arusKasPengeluaran}]]*/ [];
+
+                const opsiArusKas = {
+                    series: [
+                        {
+                            name: 'Pemasukan',
+                            data: (dataMasuk && dataMasuk.length > 0) ? dataMasuk : [0, 0, 0, 0, 0, 0]
+                        },
+                        {
+                            name: 'Pengeluaran',
+                            data: (dataKeluar && dataKeluar.length > 0) ? dataKeluar : [0, 0, 0, 0, 0, 0]
+                        }
+                    ],
+                    chart: {
+                        height: 290,
+                        type: 'area',
+                        toolbar: { show: false },
+                        fontFamily: 'Plus Jakarta Sans, sans-serif'
+                    },
+                    colors: ['#0F3D32', '#E11D48'],
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 2.5 },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.28,
+                            opacityTo: 0.04,
+                            stops: [0, 90, 100]
+                        }
+                    },
+                    xaxis: {
+                        categories: (bulanLabels && bulanLabels.length > 0) ? bulanLabels : ['-'],
+                        labels: { style: { fontSize: '12px', colors: '#64748B' } }
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (nilai) {
+                                if (nilai >= 1000000) {
+                                    return 'Rp ' + (nilai / 1000000).toFixed(1) + ' jt';
+                                } else if (nilai >= 1000) {
+                                    return 'Rp ' + (nilai / 1000).toFixed(0) + ' rb';
+                                }
+                                return 'Rp ' + nilai;
+                            },
+                            style: { fontSize: '12px', colors: '#64748B' }
+                        }
+                    },
+                    grid: {
+                        borderColor: '#E6EFEA',
+                        strokeDashArray: 4
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return 'Rp ' + Number(val).toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                };
+                new ApexCharts(elGrafikArusKas, opsiArusKas).render();
+            }
+
+            const elGrafikKategori = document.querySelector('#grafikKategori');
+            if (elGrafikKategori) {
+                const chartSeries = /*[[${chartSeries}]]*/ [];
+                const chartLabels = /*[[${chartLabels}]]*/ [];
+                const chartColors = /*[[${chartColors}]]*/ [];
+
+                const defaultColors = ['#0F3D32', '#25A18E', '#34D399', '#F59E0B', '#E11D48', '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
+                const appliedColors = (chartColors && chartColors.length > 0) ? chartColors : defaultColors;
+
+                const opsiKategori = {
+                    series: (chartSeries && chartSeries.length > 0) ? chartSeries : [],
+                    chart: {
+                        type: 'donut',
+                        height: 220,
+                        fontFamily: 'Plus Jakarta Sans, sans-serif'
+                    },
+                    labels: (chartLabels && chartLabels.length > 0) ? chartLabels : [],
+                    colors: appliedColors,
+                    legend: { show: false },
+                    dataLabels: { enabled: false },
+                    noData: {
+                        text: 'Belum ada transaksi',
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: '#64748B',
+                            fontSize: '13px',
+                            fontFamily: 'Plus Jakarta Sans, sans-serif'
+                        }
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return 'Rp ' + Number(val).toLocaleString('id-ID');
+                            }
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '74%',
+                                labels: {
+                                    show: (chartSeries && chartSeries.length > 0),
+                                    name: { fontSize: '13px', color: '#64748B' },
+                                    value: {
+                                        fontSize: '15px',
+                                        fontWeight: 700,
+                                        color: '#0F172A',
+                                        formatter: function (val) {
+                                            return 'Rp ' + Number(val).toLocaleString('id-ID');
+                                        }
+                                    },
+                                    total: {
+                                        show: true,
+                                        label: 'Total',
+                                        color: '#64748B',
+                                        formatter: function (w) {
+                                            const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                            return 'Rp ' + Number(total).toLocaleString('id-ID');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                new ApexCharts(elGrafikKategori, opsiKategori).render();
+            }
+        });
+    </script>
+</body>
+</html>
+

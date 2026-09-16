@@ -25,6 +25,7 @@ public class Transaksi {
     private BigDecimal jumlah;
     private String keterangan;
     private LocalDateTime tanggal;
+    private String kategori;
 
     @ManyToOne 
     @JoinColumn(name = "user_id")

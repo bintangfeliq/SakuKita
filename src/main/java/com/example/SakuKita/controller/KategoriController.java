@@ -33,17 +33,17 @@ public class KategoriController {
     }
 
     @PostMapping("/kategori/tambah")
-    public String tambah( @RequestParam String nama, HttpSession session, RedirectAttributes redirect) {
+    public String tambah(@RequestParam String nama, HttpSession session, RedirectAttributes redirect) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
-        }try {
+        }
+        try {
             kategoriService.tambahKategori(user, nama);
             redirect.addFlashAttribute("pesanKategori", "Kategori berhasil ditambahkan!");
         } catch (RuntimeException e) {
-            redirect.addFlashAttribute("pesanError",e.getMessage());
+            redirect.addFlashAttribute("pesanError", e.getMessage());
         }
-
         return "redirect:/kategori";
     }
 

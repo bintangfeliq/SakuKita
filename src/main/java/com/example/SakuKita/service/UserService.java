@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.SakuKita.model.User;
 import com.example.SakuKita.repository.UserRepository;
 
-@Service 
+@Service
 @Transactional
 public class UserService {
 
@@ -21,14 +21,11 @@ public class UserService {
     }
 
     public User tambahUser(User user) {
-        if (user == null || user.getEmail() == null || user.getPassword() == null) {
-            throw new RuntimeException("Data pendaftaran tidak lengkap");
-        }
-        String emailBersih = user.getEmail().trim().toLowerCase();
-        if (userRepository.findByEmail(emailBersih).isPresent()) {
+        String email = user.getEmail().trim().toLowerCase();
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email sudah terdaftar");
         }
-        user.setEmail(emailBersih);
+        user.setEmail(email);
         if (user.getName() != null) {
             user.setName(user.getName().trim());
         }
@@ -39,30 +36,11 @@ public class UserService {
     }
 
     public User login(String email, String password) {
-        if (email == null || password == null) {
-            throw new RuntimeException("Email dan kata sandi wajib diisi");
-        }
-        String emailBersih = email.trim().toLowerCase();
-        User user = userRepository.findByEmail(emailBersih)
-                .orElseThrow(() -> new RuntimeException("Email belum terdaftar"));
-
-        String inputPassword = password.trim();
-        String storedPassword = user.getPassword();
-
-        boolean passwordCocok = false;
-        if (storedPassword != null) {
-            if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
-                passwordCocok = bcrypt.matches(inputPassword, storedPassword);
-            } else {
-                passwordCocok = storedPassword.equals(inputPassword);
-                if (passwordCocok) {
-                    user.setPassword(bcrypt.encode(inputPassword));
-                    userRepository.save(user);
-                }
-            }
-        }
-
-        if (!passwordCocok) { 
+        email = email.trim().toLowerCase();
+        password = password.trim();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Email belum terdaftar"));
+        String passwordTersimpan = user.getPassword();
+        if (!bcrypt.matches(password, passwordTersimpan)) {
             throw new RuntimeException("Kata sandi salah");
         }
         return user;

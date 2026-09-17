@@ -67,7 +67,7 @@ class EndToEndAuditTest {
         assertTrue(kategoriList.isEmpty());
 
         Model model = new ConcurrentModel();
-        transaksiService.muatTrenArusKas(loggedIn, model);
+        transaksiService.diagramUang(loggedIn, model);
         kategoriService.muatAlokasiKategori(loggedIn, transaksiList, model);
 
         assertNotNull(model.getAttribute("arusKasBulan"));

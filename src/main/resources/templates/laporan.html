@@ -22,7 +22,7 @@
             <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 <div>
                     <h2 class="h3 fw-bold text-dark mb-1">Laporan Keuangan</h2>
-                    <p class="text-muted small mb-0">Analisis tren arus kas dan pemakaian uang per kategori</p>
+                    <p class="text-muted small mb-0">Laporan Pengeluaran Dan pemasukan Kamu</p>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="dropdown">
@@ -136,8 +136,77 @@
                 </div>
             </section>
 
+               <section class="card kartu-konten p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">Pemasukan dan Pengeluaran</h5>
+                        <small class="text-muted">Semua Aktivitas pemasukan dan pengeluaran Kamu ada di sini</small>
+                    </div>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0 ps-3">Keterangan</th>
+                                <th class="border-0">Kategori</th>
+                                <th class="border-0">Tanggal</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0 text-end pe-3">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            <tr th:each="t : ${transaksi}">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div th:class="${t.jenis == 'PEMASUKAN'} ? 'lingkaran-ikon-hijau lingkaran-ikon-kecil' : 'lingkaran-ikon-merah lingkaran-ikon-kecil'">
+                                            <i th:class="${t.jenis == 'PEMASUKAN'} ? 'bx bx-up-arrow-alt' : 'bx bx-down-arrow-alt'"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-semibold text-dark d-block" th:text="${t.keterangan}">Keterangan</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border rounded-pill px-3 py-1 fw-medium" th:text="${t.kategori != null and !#strings.isEmpty(t.kategori) ? t.kategori : 'Lainnya'}">Kategori</span></td>
+                                <td><span class="text-muted small" th:text="${t.tanggal != null ? #temporals.format(t.tanggal, 'dd MMM yyyy, HH:mm') : '-'}">Tanggal</span></td>
+                                <td>
+                                    <span th:if="${t.jenis == 'PEMASUKAN'}" class="text-success rounded-pill px-2 py-1 small fw-semibold">Pemasukan</span>
+                                    <span th:unless="${t.jenis == 'PEMASUKAN'}" class="text-danger rounded-pill px-2 py-1 small fw-semibold">Pengeluaran</span>
+                                </td>
+                                <td class="text-end pe-3 fw-bold angka-tabel" 
+                                    th:classappend="${t.jenis == 'PEMASUKAN'} ? 'text-success' : 'text-danger'"
+                                    th:text="(${t.jenis == 'PEMASUKAN'} ? '+ Rp ' : '- Rp ') + ${#numbers.formatDecimal(t.jumlah != null ? t.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">
+                                    Rp 0
+                                </td>
+                            </tr>
+
+                            <tr th:if="${transaksi == null or #lists.isEmpty(transaksi)}">
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <div class="d-flex flex-column align-items-center justify-content-center py-2">
+                                        <i class="bx bx-receipt text-muted mb-2" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                                        <span class="fw-semibold text-dark mb-1">Belum ada aktivitas transaksi</span>
+                                        <small class="text-muted mb-3">Mulai catat transaksi pertama Anda untuk melihat ringkasan keuangan.</small>
+                                        <div class="d-flex gap-2">
+                                            <a th:href="@{/tambahPemasukan}" class="tombol-utama text-decoration-none py-1 px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.875rem;">
+                                                <i class="bx bx-plus-circle"></i>
+                                                <span>Tambah Saldo</span>
+                                            </a>
+                                            <a th:href="@{/tambahPengeluaran}" class="tombol-putih text-decoration-none py-1 px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.875rem;">
+                                                <i class="bx bx-minus-circle"></i>
+                                                <span>Catat Pengeluaran</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <footer class="text-center py-3 text-muted small border-top mt-4">
-                © 2026 SakuKita &bull; Solusi Literasi & Pengelolaan Finansial Cerdas.
+               <div class="container">
+                 <p class="mb-0">© 2026 SakuKita. Kelola keuangan kamu tanpa drama.</p>
+               </div>
             </footer>
         </main>
     </div>
@@ -148,9 +217,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             const elGrafikArusKas = document.querySelector('#grafikArusKas');
             if (elGrafikArusKas) {
-                const bulanLabels = /*[[${arusKasBulan}]]*/ [];
-                const dataMasuk = /*[[${arusKasPemasukan}]]*/ [];
-                const dataKeluar = /*[[${arusKasPengeluaran}]]*/ [];
+                const bulanLabels = [];
+                const dataMasuk =  [];
+                const dataKeluar =  [];
 
                 const opsiArusKas = {
                     series: [
@@ -215,61 +284,39 @@
 
             const elGrafikKategori = document.querySelector('#grafikKategori');
             if (elGrafikKategori) {
-                const chartSeries = /*[[${chartSeries}]]*/ [];
-                const chartLabels = /*[[${chartLabels}]]*/ [];
-                const chartColors = /*[[${chartColors}]]*/ [];
+                const chartSeries =  [];
+                const chartLabels = [];
+                const chartColors =  [];
 
                 const defaultColors = ['#0F3D32', '#25A18E', '#34D399', '#F59E0B', '#E11D48', '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
                 const appliedColors = (chartColors && chartColors.length > 0) ? chartColors : defaultColors;
 
                 const opsiKategori = {
                     series: (chartSeries && chartSeries.length > 0) ? chartSeries : [],
-                    chart: {
-                        type: 'donut',
-                        height: 220,
-                        fontFamily: 'Plus Jakarta Sans, sans-serif'
+                    chart: {type: 'donut', height: 220, fontFamily: 'Plus Jakarta Sans, sans-serif'
                     },
                     labels: (chartLabels && chartLabels.length > 0) ? chartLabels : [],
                     colors: appliedColors,
                     legend: { show: false },
                     dataLabels: { enabled: false },
-                    noData: {
-                        text: 'Belum ada transaksi',
-                        align: 'center',
-                        verticalAlign: 'middle',
-                        style: {
-                            color: '#64748B',
-                            fontSize: '13px',
-                            fontFamily: 'Plus Jakarta Sans, sans-serif'
+                    noData: { text: 'Belum ada transaksi', align: 'center',verticalAlign: 'middle',
+                        style: {color: '#64748B', fontSize: '13px', fontFamily: 'Plus Jakarta Sans, sans-serif'
                         }
                     },
-                    tooltip: {
-                        y: {
+                    tooltip: {y: {
                             formatter: function (val) {
                                 return 'Rp ' + Number(val).toLocaleString('id-ID');
                             }
                         }
                     },
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                size: '74%',
-                                labels: {
+                    plotOptions: {pie: {donut: {size: '74%',labels: {
                                     show: (chartSeries && chartSeries.length > 0),
                                     name: { fontSize: '13px', color: '#64748B' },
-                                    value: {
-                                        fontSize: '15px',
-                                        fontWeight: 700,
-                                        color: '#0F172A',
-                                        formatter: function (val) {
+                                    value: {fontSize: '15px', fontWeight: 700, color: '#0F172A', formatter: function (val) {
                                             return 'Rp ' + Number(val).toLocaleString('id-ID');
                                         }
                                     },
-                                    total: {
-                                        show: true,
-                                        label: 'Total',
-                                        color: '#64748B',
-                                        formatter: function (w) {
+                                    total: {show: true, label: 'Total', color: '#64748B', formatter: function (w) {
                                             const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
                                             return 'Rp ' + Number(total).toLocaleString('id-ID');
                                         }

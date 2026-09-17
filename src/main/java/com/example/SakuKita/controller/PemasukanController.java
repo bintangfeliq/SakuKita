@@ -1,4 +1,4 @@
-package com.example.SakuKita.controller;
+﻿package com.example.SakuKita.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,11 +29,13 @@ public class PemasukanController {
     }
 
     @GetMapping("/pemasukan")
-    public String halamanPemasukan(@RequestParam(required = false, defaultValue = "bulan") String periode, HttpSession session, Model model) {
+    public String halamanPemasukan(@RequestParam(defaultValue = "bulan") String periode, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/login";
-        List<Transaksi> userTx = transaksiService.cariTransaksiUser(user).stream().filter(t -> "PEMASUKAN".equalsIgnoreCase(t.getJenis())).toList();
-        model.addAttribute("transaksi", transaksiService.filterTransaksi(userTx, periode));
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<Transaksi> transaksi = transaksiService.cariTransaksiUser(user).stream().filter(t -> "PEMASUKAN".equalsIgnoreCase(t.getJenis())).toList();
+        model.addAttribute("transaksi", transaksiService.filterTransaksi(transaksi, periode));
         model.addAttribute("kategori", kategoriService.cariKategoriUser(user));
         model.addAttribute("totalPemasukan", transaksiService.totalPemasukan(user, periode));
         model.addAttribute("periode", periode);
@@ -43,7 +45,9 @@ public class PemasukanController {
     @GetMapping("/tambahPemasukan")
     public String halamanTambahPemasukan(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/login";
+        if (user == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("kategori", kategoriService.cariKategoriUser(user));
         return "tambahPemasukan";
     }
@@ -51,7 +55,9 @@ public class PemasukanController {
     @PostMapping("/pemasukan/tambah")
     public String tambahPemasukan(@RequestParam BigDecimal jumlah, @RequestParam String keterangan, @RequestParam(required = false, defaultValue = "Lainnya") String kategori, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/login";
+        if (user == null) {
+            return "redirect:/login";
+        }
         transaksiService.pemasukan(user, jumlah, keterangan, kategori);
         redirectAttributes.addFlashAttribute("pesanPemasukan", "Pemasukan berhasil dicatat!");
         return "redirect:/pemasukan";

@@ -29,9 +29,9 @@ public class KategoriService {
         if (user == null) {
             return List.of();
         }
+
         return kategoriRepository.findByUserOrderByIdDesc(user);
     }
-
     public Kategori tambahKategori(User user, String nama) {
         String namaBersih = nama.trim();
         if (kategoriRepository.existsByUserIdAndNamaIgnoreCase(user.getId(), namaBersih)) {
@@ -57,30 +57,36 @@ public class KategoriService {
     public void muatAlokasiKategori(User user, List<Transaksi> transaksi, Model model) {
         List<Kategori> kategoriUser = cariKategoriUser(user);
         List<String> warna = List.of(
-            "#0F3D32",
-            "#25A18E",
-            "#34D399",
-            "#F59E0B",
-            "#6366F1",
-            "#EC4899",
-            "#8B5CF6",
-            "#14B8A6",
-            "#F97316",
-            "#64748B"
+                "#0F3D32",
+                "#25A18E",
+                "#34D399",
+                "#F59E0B",
+                "#6366F1",
+                "#EC4899",
+                "#8B5CF6",
+                "#14B8A6",
+                "#F97316",
+                "#64748B"
         );
 
         List<Map<String, Object>> alokasi = new ArrayList<>();
         List<String> chartLabels = new ArrayList<>();
         List<BigDecimal> chartSeries = new ArrayList<>();
         List<String> chartColors = new ArrayList<>();
-        int index = 0;
-        for (Kategori kategori : kategoriUser) {
+        for (int i = 0; i < kategoriUser.size(); i++) {
+            Kategori kategori = kategoriUser.get(i);
             BigDecimal total = BigDecimal.ZERO;
             if (transaksi != null) {
-                total = transaksi.stream().filter(t -> t.getJumlah() != null && kategori.getNama() != null && kategori.getNama().equalsIgnoreCase(t.getKategori())).map(Transaksi::getJumlah).reduce(BigDecimal.ZERO, BigDecimal::add);
+                total = transaksi.stream()
+                        .filter(t -> t.getJumlah() != null)
+                        .filter(t -> t.getKategori() != null)
+                        .filter(t -> t.getKategori()
+                        .equalsIgnoreCase(kategori.getNama()))
+                        .map(Transaksi::getJumlah)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
 
-            String warnaKategori = warna.get(index % warna.size());
+            String warnaKategori = warna.get(i % warna.size());
             Map<String, Object> data = new HashMap<>();
             data.put("nama", kategori.getNama());
             data.put("total", total);
@@ -91,8 +97,8 @@ public class KategoriService {
                 chartSeries.add(total);
                 chartColors.add(warnaKategori);
             }
-            index++;
         }
+
         model.addAttribute("alokasiKategori", alokasi);
         model.addAttribute("chartLabels", chartLabels);
         model.addAttribute("chartSeries", chartSeries);

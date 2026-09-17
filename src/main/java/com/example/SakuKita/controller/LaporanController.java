@@ -26,15 +26,16 @@ public class LaporanController {
     }
 
     @GetMapping("/laporan")
-    public String halamanLaporan(@RequestParam(required = false, defaultValue = "bulan") String periode, HttpSession session, Model model) {
+    public String halamanLaporan(@RequestParam(defaultValue = "bulan") String periode, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) return "redirect:/login";
         List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
         List<Transaksi> filteredTx = transaksiService.filterTransaksi(userTx, periode);
+        model.addAttribute("transaksi", filteredTx);
         model.addAttribute("totalPemasukan", transaksiService.totalPemasukan(user, periode));
         model.addAttribute("totalPengeluaran", transaksiService.totalPengeluaran(user, periode));
         model.addAttribute("periode", periode);
-        transaksiService.muatTrenArusKas(user, model);
+        transaksiService.diagramUang(user, model);
         kategoriService.muatAlokasiKategori(user, filteredTx, model);
         return "laporan";
     }

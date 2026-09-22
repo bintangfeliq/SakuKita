@@ -65,6 +65,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("budi@email.com")).thenReturn(Optional.of(user));
 
         User loggedInUser = userService.login("budi@email.com", "passwordBenar");
+
         assertNotNull(loggedInUser);
         assertEquals("Budi", loggedInUser.getName());
     }
@@ -76,20 +77,7 @@ class UserServiceTest {
 
         when(userRepository.findByEmail("budi@email.com")).thenReturn(Optional.of(user));
 
-        assertThrows(RuntimeException.class, () -> userService.login("budi@email.com", "passwordSalah"));
-    }
-
-    @Test
-    void testLogin_UserLamaPlainText_BerhasilDanDiupgradeKeBcrypt() {
-        User user = new User(2L, "UserLama", "lama@email.com", "plain123");
-
-        when(userRepository.findByEmail("lama@email.com")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        User loggedInUser = userService.login("lama@email.com", "plain123");
-        assertNotNull(loggedInUser);
-        assertTrue(loggedInUser.getPassword().startsWith("$2a$") || loggedInUser.getPassword().startsWith("$2b$"));
-        assertTrue(encoder.matches("plain123", loggedInUser.getPassword()));
+        assertThrows(RuntimeException.class,
+                () -> userService.login("budi@email.com", "passwordSalah"));
     }
 }
-

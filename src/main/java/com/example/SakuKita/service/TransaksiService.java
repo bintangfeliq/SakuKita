@@ -80,7 +80,7 @@ public class TransaksiService {
         if (transaksi == null || transaksi.isEmpty()) {
             return BigDecimal.ZERO;
         }
-        return transaksi.stream().map(t -> t.getJumlah()).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return transaksi.stream().map(t -> t.getJumlah()).filter(Objects::nonNull).reduce(BigDecimal.ZERO, (total, jumlah) -> total.add(jumlah));
     }
 
     public BigDecimal totalPemasukan(User user, String periode) {
@@ -121,7 +121,6 @@ public class TransaksiService {
                 if (t.getTanggal() == null || t.getJumlah() == null) {
                     continue;
                 }
-
                 if (!YearMonth.from(t.getTanggal()).equals(bulanSekarang)) {
                     continue;
                 }

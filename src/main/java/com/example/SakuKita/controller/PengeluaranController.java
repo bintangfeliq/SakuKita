@@ -1,4 +1,4 @@
-﻿package com.example.SakuKita.controller;
+package com.example.SakuKita.controller;
 
 import java.math.BigDecimal;
 import java.util.List;

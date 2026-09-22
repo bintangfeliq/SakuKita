@@ -85,7 +85,7 @@ public class KategoriService {
                         .map(Transaksi::getJumlah)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
-
+            
             String warnaKategori = warna.get(i % warna.size());
             Map<String, Object> data = new HashMap<>();
             data.put("nama", kategori.getNama());

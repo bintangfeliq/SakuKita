@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -220,6 +221,44 @@ class WebPageAuditTest {
 
         mockMvc.perform(get("/pengeluaran").sessionAttr("user", user).param("periode", "semua"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testPaginationTabelData() throws Exception {
+        String email = "page_" + System.currentTimeMillis() + "@test.com";
+        User user = userService.tambahUser(new User(null, "User Paging", email, "secret123"));
+
+        for (int i = 1; i <= 12; i++) {
+            kategoriService.tambahKategori(user, "Kategori " + i);
+            transaksiService.pemasukan(user, new BigDecimal("100000"), "Pemasukan " + i, "Kategori " + i);
+            transaksiService.pengeluaran(user, new BigDecimal("50000"), "Pengeluaran " + i, "Kategori " + i);
+        }
+
+        mockMvc.perform(get("/pemasukan").sessionAttr("user", user).param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("currentPage", 1))
+                .andExpect(model().attribute("totalPages", 2))
+                .andExpect(model().attribute("totalItems", 12));
+
+        mockMvc.perform(get("/pemasukan").sessionAttr("user", user).param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("currentPage", 2));
+
+        mockMvc.perform(get("/pengeluaran").sessionAttr("user", user).param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("currentPage", 1))
+                .andExpect(model().attribute("totalPages", 2));
+
+        mockMvc.perform(get("/laporan").sessionAttr("user", user).param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("currentPage", 1))
+                .andExpect(model().attribute("totalPages", 3));
+
+        mockMvc.perform(get("/kategori").sessionAttr("user", user).param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("currentPage", 1))
+                .andExpect(model().attribute("totalPages", 2))
+                .andExpect(model().attribute("totalItems", 12));
     }
 }
 

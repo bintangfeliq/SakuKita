@@ -82,8 +82,8 @@ public class KategoriService {
                         .filter(t -> t.getKategori() != null)
                         .filter(t -> t.getKategori()
                         .equalsIgnoreCase(kategori.getNama()))
-                        .map(Transaksi::getJumlah)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .map(t -> t.getJumlah())
+                        .reduce(BigDecimal.ZERO, (hasil, jumlah) -> hasil.add(jumlah));
             }
             
             String warnaKategori = warna.get(i % warna.size());

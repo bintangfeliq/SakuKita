@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <th:block th:fragment="alert">
+        <div th:if="${pesanSukses != null or pesanPemasukan != null or pesanPengeluaran != null or pesanKategori != null}" 
+             class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 border py-2.5 px-3" 
+             style="background-color: #E6F4EF; border-color: #BEE3D5 !important; color: #0F5132; border-radius: 12px;" 
+             role="alert">
+            <i class="bx bx-check-circle fs-5 flex-shrink-0 text-success"></i>
+            <div class="small fw-semibold flex-grow-1" 
+                 th:text="${pesanSukses != null ? pesanSukses : (pesanPemasukan != null ? pesanPemasukan : (pesanPengeluaran != null ? pesanPengeluaran : pesanKategori))}">
+                Operasi berhasil dijalankan!
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+
+        <div th:if="${pesanError != null}" 
+             class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 border py-2.5 px-3" 
+             style="background-color: #FEECEE; border-color: #FCA5A5 !important; color: #842029; border-radius: 12px;" 
+             role="alert">
+            <i class="bx bx-error-circle fs-5 flex-shrink-0 text-danger"></i>
+            <div class="small fw-semibold flex-grow-1" th:text="${pesanError}">
+                Terjadi kesalahan, silakan coba lagi.
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+    </th:block>
+</body>
+</html>
+

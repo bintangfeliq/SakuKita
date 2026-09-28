@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pemasukan - SakuKita</title>
-    <link rel="icon" type="image/png" th:href="@{/images/logo.png}" />
+    <link rel="icon" type="image/png" th:href="@{/images/logo1.png}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
@@ -17,23 +17,34 @@
     <div class="wadah-dashboard-utama">
         <aside th:replace="~{fragments/sidebar :: sidebar('pemasukan')}"></aside>
         <main class="area-konten-dashboard">
-            <div th:if="${pesanPemasukan}" class="alert alert-success d-flex align-items-center gap-2 mb-4 border-0 rounded-4 py-3 px-4 shadow-sm" style="background-color: #E6F4EF; color: #0F766E;">
-                <i class="bx bx-check-circle fs-5"></i>
-                <span th:text="${pesanPemasukan}">Pemasukan berhasil dicatat!</span>
-            </div>
+            <div th:replace="~{fragments/alert :: alert}"></div>
             <div class="kartu-sambutan mb-4">
                 <div class="kartu-sambutan-pola"></div>
-                <div class="row align-items-center position-relative">
+                <div class="row align-items-center position-relative d-none d-lg-flex">
                     <div class="col-lg-6 mb-3 mb-lg-0">
                         <h2 class="judul-kartu-sambutan font-judul">Pemasukan SakuKita</h2>
                         <p class="deskripsi-kartu-sambutan mb-3">
                             Pantau seluruh arus kas masuk Anda untuk mengontrol kondisi dan kestabilan finansial secara berkelanjutan.
                         </p>
-                        <div class="d-flex align-items-center gap-2">
-                        <a th:href="@{/tambahPemasukan}" class="tombol-putih text-decoration-none py-1 px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.875rem;">
-                            <i class="bx bx-plus"></i>
-                            <span>Tambah Pemasukan</span>
-                        </a>
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <a th:href="@{/tambahPemasukan}" class="tombol-putih text-decoration-none py-1 px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.875rem;">
+                                <i class="bx bx-plus"></i>
+                                <span>Tambah Pemasukan</span>
+                            </a>
+                            <div th:if="${templatesPemasukan != null and !#lists.isEmpty(templatesPemasukan)}" class="dropdown">
+                                <button class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.875rem; background: rgba(255, 255, 255, 0.12);">
+                                    <i class="bx bx-bookmark"></i>
+                                    <span>Gunakan Template</span>
+                                </button>
+                                <ul class="dropdown-menu shadow border-0 py-1" style="border-radius: 12px; min-width: 220px;">
+                                    <li th:each="tpl : ${templatesPemasukan}">
+                                        <a class="dropdown-item py-2 px-3 small d-flex justify-content-between align-items-center" th:href="@{/tambahPemasukan(templateId=${tpl.id})}">
+                                            <span class="fw-semibold text-truncate me-2" th:text="${tpl.nama}">Nama Template</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle" th:text="'Rp' + ${#numbers.formatDecimal(tpl.jumlah, 0, 'POINT', 0, 'COMMA')}">Rp0</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -74,6 +85,65 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="position-relative d-lg-none">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-2">
+                        <span class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.06em;">TOTAL PEMASUKAN</span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm text-white border border-white-50 rounded-pill px-2.5 py-0.5 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; background: rgba(255, 255, 255, 0.1);">
+                                <i class="bx bx-calendar"></i>
+                                <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua' : 'Bulan Ini')}">Bulan Ini</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; min-width: 130px;">
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'bulan' or periode == null} ? 'active' : ''" th:href="@{/pemasukan(periode='bulan')}">
+                                        <span>Bulan Ini</span>
+                                        <i th:if="${periode == 'bulan' or periode == null}" class="bx bx-check"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'tahun'} ? 'active' : ''" th:href="@{/pemasukan(periode='tahun')}">
+                                        <span>Tahun Ini</span>
+                                        <i th:if="${periode == 'tahun'}" class="bx bx-check"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'semua'} ? 'active' : ''" th:href="@{/pemasukan(periode='semua')}">
+                                        <span>Semua</span>
+                                        <i th:if="${periode == 'semua'}" class="bx bx-check"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="fw-bold text-white angka-tabel mb-1" style="font-size: 1.45rem; line-height: 1.2;" th:text="'Rp ' + ${#numbers.formatDecimal(totalPemasukan != null ? totalPemasukan : 0, 0, 'POINT', 0, 'COMMA')}">
+                        Rp 0
+                    </div>
+                    <span class="text-white-50 d-block small mb-2.5" style="font-size: 0.72rem;" th:text="${periode == 'tahun' ? 'pemasukan tahun ini' : (periode == 'semua' ? 'seluruh pemasukan yang tercatat' : 'pemasukan bulan ini')}">
+                        pemasukan bulan ini
+                    </span>
+
+                    <div class="pt-2 border-top-matte d-flex align-items-center flex-wrap gap-2">
+                        <a th:href="@{/tambahPemasukan}" class="tombol-putih text-decoration-none py-1 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem; border-radius: 9999px;">
+                            <i class="bx bx-plus" style="font-size: 0.95rem;"></i>
+                            <span>Tambah Pemasukan</span>
+                        </a>
+                        <div th:if="${templatesPemasukan != null and !#lists.isEmpty(templatesPemasukan)}" class="dropdown">
+                            <button class="btn btn-sm btn-outline-light rounded-pill px-2.5 py-1 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.78rem; background: rgba(255, 255, 255, 0.12);">
+                                <i class="bx bx-bookmark" style="font-size: 0.9rem;"></i>
+                                <span>Gunakan Template</span>
+                            </button>
+                            <ul class="dropdown-menu shadow border-0 py-1" style="border-radius: 12px; min-width: 210px;">
+                                <li th:each="tpl : ${templatesPemasukan}">
+                                    <a class="dropdown-item py-1.5 px-3 small d-flex justify-content-between align-items-center" th:href="@{/tambahPemasukan(templateId=${tpl.id})}">
+                                        <span class="fw-semibold text-truncate me-2" th:text="${tpl.nama}">Nama Template</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle" th:text="'Rp' + ${#numbers.formatDecimal(tpl.jumlah, 0, 'POINT', 0, 'COMMA')}">Rp0</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="card kartu-konten p-4">
@@ -88,7 +158,7 @@
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="lencana-metrik-hijau">
-                            <span th:text="${transaksi != null ? #lists.size(transaksi) : 0} + ' Catatan'">0 Catatan</span>
+                            <span th:text="${totalItems != null ? totalItems : (transaksi != null ? #lists.size(transaksi) : 0)} + ' Catatan'">0 Catatan</span>
                         </span>
                     </div>
                 </div>
@@ -118,6 +188,26 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div th:if="${totalPages != null and totalPages > 1}" class="d-flex justify-content-center align-items-center mt-3 pt-3 border-top">
+                    <nav aria-label="Navigasi Halaman" class="overflow-auto max-w-100">
+                        <ul class="pagination pagination-sm mb-0 justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${currentPage - 1})}" aria-label="Sebelumnya" title="Sebelumnya">
+                                    <i class="bx bx-chevron-left fs-5"></i>
+                                </a>
+                            </li>
+                            <li th:each="i : ${#numbers.sequence(1, totalPages)}" class="page-item" th:classappend="${currentPage == i} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${i})}" th:text="${i}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${currentPage + 1})}" aria-label="Selanjutnya" title="Selanjutnya">
+                                    <i class="bx bx-chevron-right fs-5"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
 
                 <div th:if="${transaksi == null or #lists.isEmpty(transaksi)}" class="text-center py-5">

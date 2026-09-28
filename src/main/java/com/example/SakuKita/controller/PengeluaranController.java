@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.SakuKita.model.Transaksi;
 import com.example.SakuKita.model.User;
 import com.example.SakuKita.service.KategoriService;
+import com.example.SakuKita.service.TemplateTransaksiService;
 import com.example.SakuKita.service.TransaksiService;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,33 +23,53 @@ public class PengeluaranController {
 
     private final TransaksiService transaksiService;
     private final KategoriService kategoriService;
+    private final TemplateTransaksiService templateTransaksiService;
 
-    public PengeluaranController( TransaksiService transaksiService, KategoriService kategoriService) {
+    public PengeluaranController(TransaksiService transaksiService, KategoriService kategoriService, TemplateTransaksiService templateTransaksiService) {
         this.transaksiService = transaksiService;
         this.kategoriService = kategoriService;
+        this.templateTransaksiService = templateTransaksiService;
     }
 
     @GetMapping("/pengeluaran")
-    public String halamanPengeluaran(@RequestParam(defaultValue = "bulan") String periode, HttpSession session, Model model) {
+    public String halamanPengeluaran(@RequestParam(defaultValue = "bulan") String periode, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
         List<Transaksi> transaksi = transaksiService.cariTransaksiUser(user).stream().filter(t -> "PENGELUARAN".equalsIgnoreCase(t.getJenis())).toList();
-        model.addAttribute("transaksi", transaksiService.filterTransaksi(transaksi, periode));
+        List<Transaksi> filtered = transaksiService.filterTransaksi(transaksi, periode);
+        int pageSize = 10;
+        int totalItems = filtered.size();
+        int totalPages = Math.max(1,(int) Math.ceil((double) totalItems / pageSize));
+        page = Math.max(1, Math.min(page, totalPages));
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalItems);
+        List<Transaksi> paged = filtered.subList(fromIndex, toIndex);
+        model.addAttribute("transaksi", paged);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("fromIndex", totalItems == 0 ? 0 : fromIndex + 1);
+        model.addAttribute("toIndex", toIndex);
         model.addAttribute("kategori", kategoriService.cariKategoriUser(user));
         model.addAttribute("totalPengeluaran", transaksiService.totalPengeluaran(user, periode));
         model.addAttribute("periode", periode);
+        model.addAttribute("templatesPengeluaran",templateTransaksiService.cariBerdasarkanJenis(user, "PENGELUARAN"));
         return "pengeluaran";
     }
 
     @GetMapping("/tambahPengeluaran")
-    public String halamanTambahPengeluaran(HttpSession session, Model model) {
+    public String halamanTambahPengeluaran(@RequestParam(required = false) Long templateId, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
         model.addAttribute("kategori", kategoriService.cariKategoriUser(user));
+        model.addAttribute("templatesPengeluaran", templateTransaksiService.cariBerdasarkanJenis(user, "PENGELUARAN"));
+        if (templateId != null) {
+            templateTransaksiService.cariBerdasarkanId(templateId, user).filter(tpl -> "PENGELUARAN".equalsIgnoreCase(tpl.getJenis())).ifPresent(tpl -> model.addAttribute("templateDipilih", tpl));
+        }
         return "tambahPengeluaran";
     }
 
@@ -60,11 +81,10 @@ public class PengeluaranController {
         }
         try {
             transaksiService.pengeluaran(user, jumlah, keterangan, kategori);
-            redirectAttributes.addFlashAttribute("pesanPengeluaran","Pengeluaran berhasil dicatat!");
+            redirectAttributes.addFlashAttribute("pesanPengeluaran", "Pengeluaran berhasil dicatat!");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("pesanError", e.getMessage());
         }
-
         return "redirect:/pengeluaran";
     }
 }

@@ -112,7 +112,7 @@ public class TransaksiService {
                 "Sep", "Okt", "Nov", "Des"
         };
         YearMonth sekarang = YearMonth.now();
-        for (int i = 5; i >= 0; i--) {
+        for (int i = 11; i >= 0; i--) {
             YearMonth bulanSekarang = sekarang.minusMonths(i);
             bulan.add(namaBulan[bulanSekarang.getMonthValue() - 1]);
             BigDecimal totalMasuk = BigDecimal.ZERO;

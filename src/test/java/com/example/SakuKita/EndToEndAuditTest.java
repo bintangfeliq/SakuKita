@@ -40,6 +40,9 @@ class EndToEndAuditTest {
     @Autowired
     private KategoriService kategoriService;
 
+    @Autowired
+    private com.example.SakuKita.service.TemplateTransaksiService templateTransaksiService;
+
     @Test
     void testAlurUserBaru_RegisterLogin_SaldoPemasukanPengeluaranNol() {
         String email = "audit_baru_" + System.currentTimeMillis() + "@test.com";
@@ -143,6 +146,26 @@ class EndToEndAuditTest {
         kategoriService.hapusKategori(user, kat.getId());
         List<Kategori> sisa = kategoriService.cariKategoriUser(user);
         assertTrue(sisa.isEmpty());
+    }
+
+    @Test
+    void testTemplateTransaksi_SimpanDanGunakan() {
+        String email = "tpl_" + System.currentTimeMillis() + "@test.com";
+        User user = userService.tambahUser(new User(null, "User Template", email, "pass123"));
+
+        com.example.SakuKita.model.TemplateTransaksi tpl = new com.example.SakuKita.model.TemplateTransaksi();
+        tpl.setNama("Gaji Bulanan");
+        tpl.setJenis("PEMASUKAN");
+        tpl.setJumlah(new BigDecimal("5000000"));
+        tpl.setKeterangan("Uang Gaji");
+
+        com.example.SakuKita.model.TemplateTransaksi saved = templateTransaksiService.simpanTemplate(tpl, user);
+        assertNotNull(saved.getId());
+        assertEquals("Gaji Bulanan", saved.getNama());
+        assertEquals(1, templateTransaksiService.semuaTemplate(user).size());
+
+        templateTransaksiService.hapusTemplate(saved.getId(), user);
+        assertTrue(templateTransaksiService.semuaTemplate(user).isEmpty());
     }
 }
 

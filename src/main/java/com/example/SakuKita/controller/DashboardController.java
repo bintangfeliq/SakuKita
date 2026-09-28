@@ -31,6 +31,7 @@ public class DashboardController {
         model.addAttribute("pemasukan", transaksiService.pemasukanBulanan(user));
         model.addAttribute("pengeluaran", transaksiService.pengeluaranBulanan(user));
         model.addAttribute("transaksiTerakhir", transaksiService.cari5TransaksiTerakhir(user));
+        transaksiService.diagramUang(user, model);
         return "dashboard";
     }
 }

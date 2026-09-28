@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Template Transaksi - SakuKita</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo1.png}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" th:href="@{/css/sakukita.css}" />
+</head>
+<body>
+    <div class="wadah-dashboard-utama">
+        <aside th:replace="~{fragments/sidebar :: sidebar('templateTransaksi')}"></aside>
+
+        <main class="area-konten-dashboard">
+            <div th:replace="~{fragments/alert :: alert}"></div>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h2 class="h3 fw-bold text-dark mb-1">Template Transaksi</h2>
+                    <p class="text-muted small mb-0">Simpan format transaksi rutin Anda agar tidak perlu mengetik ulang</p>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button" class="tombol-utama py-2 px-3 small text-decoration-none" style="border-radius: 8px !important;" data-bs-toggle="modal" data-bs-target="#modalPemasukan">
+                        <span>+ Template Pemasukan</span>
+                    </button>
+                    <button type="button" class="btn btn-danger py-2 px-3 small fw-semibold shadow-none" style="background-color: #E11D48; border-color: #E11D48; border-radius: 8px !important;" data-bs-toggle="modal" data-bs-target="#modalPengeluaran">
+                        <span>+ Template Pengeluaran</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <section class="card kartu-konten p-4 h-100" style="border-radius: 16px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="lingkaran-ikon-hijau" style="width: 38px; height: 38px; font-size: 1.2rem;">
+                                    <i class="bx bx-trending-up"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-success" style="color: #0F5132 !important;">Template Pemasukan</h5>
+                                    <small class="text-muted">Transaksi rutin uang masuk</small>
+                                </div>
+                            </div>
+                            <span class="lencana-metrik-hijau">
+                                <span th:text="${templatePemasukan != null ? #lists.size(templatePemasukan) : 0} + ' Template'">0 Template</span>
+                            </span>
+                        </div>
+
+                        <div th:if="${templatePemasukan != null and !#lists.isEmpty(templatePemasukan)}" class="list-group list-group-flush">
+                            <div th:each="tpl : ${templatePemasukan}" class="list-group-item px-2 py-3 d-flex justify-content-between align-items-center bg-transparent border-bottom">
+                                <div class="d-flex align-items-center gap-2 overflow-hidden me-2">
+                                    <i class="bx bx-bookmark text-success fs-5 flex-shrink-0"></i>
+                                    <span class="fw-semibold text-dark text-truncate" th:text="${tpl.nama}">Nama Template</span>
+                                </div>
+                                <div class="dropdown flex-shrink-0">
+                                    <button class="btn btn-sm btn-light border-0 shadow-none p-1 rounded-circle d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;">
+                                        <i class="bx bx-dots-vertical-rounded fs-5 text-secondary"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-1" style="border-radius: 12px; min-width: 160px;">
+                                        <li>
+                                            <form th:action="@{/templateTransaksi/gunakan/{id}(id=${tpl.id})}" method="post">
+                                                <button type="submit" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-success fw-medium">
+                                                    <i class="bx bx-check-circle fs-6"></i>
+                                                    <span>Gunakan</span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-dark" data-bs-toggle="modal" th:data-bs-target="'#modalDetail' + ${tpl.id}">
+                                                <i class="bx bx-info-circle fs-6 text-muted"></i>
+                                                <span>Detail</span>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-dark" data-bs-toggle="modal" th:data-bs-target="'#modalUpdate' + ${tpl.id}">
+                                                <i class="bx bx-edit-alt fs-6 text-muted"></i>
+                                                <span>Update</span>
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li>
+                                            <form th:action="@{/templateTransaksi/hapus/{id}(id=${tpl.id})}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus template ini?');">
+                                                <button type="submit" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-danger fw-medium">
+                                                    <i class="bx bx-trash fs-6"></i>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${templatePemasukan == null or #lists.isEmpty(templatePemasukan)}" class="text-center py-5 text-muted">
+                            <i class="bx bx-bookmark-alt text-muted mb-2" style="font-size: 2rem; opacity: 0.4;"></i>
+                            <p class="mb-0 small">Belum ada template pemasukan.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-lg-6">
+                    <section class="card kartu-konten p-4 h-100" style="border-radius: 16px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="lingkaran-ikon-merah" style="width: 38px; height: 38px; font-size: 1.2rem;">
+                                    <i class="bx bx-trending-down"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-danger" style="color: #BE123C !important;">Template Pengeluaran</h5>
+                                    <small class="text-muted">Transaksi rutin uang keluar</small>
+                                </div>
+                            </div>
+                            <span class="lencana-metrik-merah">
+                                <span th:text="${templatePengeluaran != null ? #lists.size(templatePengeluaran) : 0} + ' Template'">0 Template</span>
+                            </span>
+                        </div>
+
+                        <div th:if="${templatePengeluaran != null and !#lists.isEmpty(templatePengeluaran)}" class="list-group list-group-flush">
+                            <div th:each="tpl : ${templatePengeluaran}" class="list-group-item px-2 py-3 d-flex justify-content-between align-items-center bg-transparent border-bottom">
+                                <div class="d-flex align-items-center gap-2 overflow-hidden me-2">
+                                    <i class="bx bx-bookmark text-danger fs-5 flex-shrink-0"></i>
+                                    <span class="fw-semibold text-dark text-truncate" th:text="${tpl.nama}">Nama Template</span>
+                                </div>
+                                <div class="dropdown flex-shrink-0">
+                                    <button class="btn btn-sm btn-light border-0 shadow-none p-1 rounded-circle d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;">
+                                        <i class="bx bx-dots-vertical-rounded fs-5 text-secondary"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-1" style="border-radius: 12px; min-width: 160px;">
+                                        <li>
+                                            <form th:action="@{/templateTransaksi/gunakan/{id}(id=${tpl.id})}" method="post">
+                                                <button type="submit" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-danger fw-medium">
+                                                    <i class="bx bx-check-circle fs-6"></i>
+                                                    <span>Gunakan</span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-dark" data-bs-toggle="modal" th:data-bs-target="'#modalDetail' + ${tpl.id}">
+                                                <i class="bx bx-info-circle fs-6 text-muted"></i>
+                                                <span>Detail</span>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-dark" data-bs-toggle="modal" th:data-bs-target="'#modalUpdate' + ${tpl.id}">
+                                                <i class="bx bx-edit-alt fs-6 text-muted"></i>
+                                                <span>Update</span>
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li>
+                                            <form th:action="@{/templateTransaksi/hapus/{id}(id=${tpl.id})}" method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus template ini?');">
+                                                <button type="submit" class="dropdown-item py-2 px-3 small d-flex align-items-center gap-2 text-danger fw-medium">
+                                                    <i class="bx bx-trash fs-6"></i>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${templatePengeluaran == null or #lists.isEmpty(templatePengeluaran)}" class="text-center py-5 text-muted">
+                            <i class="bx bx-bookmark-alt text-muted mb-2" style="font-size: 2rem; opacity: 0.4;"></i>
+                            <p class="mb-0 small">Belum ada template pengeluaran.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <th:block th:each="tpl : ${templatePemasukan}">
+        <div class="modal fade" th:id="'modalDetail' + ${tpl.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <div class="modal-header border-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="lingkaran-ikon-hijau" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                                <i class="bx bx-bookmark"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-dark">Detail Template Pemasukan</h5>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-3">
+                        <div class="p-3 bg-light rounded-3 mb-3">
+                            <small class="text-muted d-block mb-1">Nama Template</small>
+                            <h6 class="fw-bold text-dark mb-0" th:text="${tpl.nama}">Nama Template</h6>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <small class="text-muted d-block mb-1">Jumlah Nominal</small>
+                                    <span class="fw-bold text-success angka-tabel" th:text="'Rp ' + ${#numbers.formatDecimal(tpl.jumlah != null ? tpl.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <small class="text-muted d-block mb-1">Kategori</small>
+                                    <span class="badge rounded-pill bg-label-success text-success px-2 py-1 small" th:text="${tpl.kategori != null ? tpl.kategori.nama : 'Tanpa Kategori'}">Kategori</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">Keterangan</small>
+                            <p class="mb-0 small text-dark" th:text="${tpl.keterangan != null and !#strings.isEmpty(tpl.keterangan) ? tpl.keterangan : '-'}">-</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Tutup</button>
+                        <form th:action="@{/templateTransaksi/gunakan/{id}(id=${tpl.id})}" method="post" class="d-inline">
+                            <button type="submit" class="tombol-utama py-2 px-4 small" style="border-radius: 8px !important;">
+                                <i class="bx bx-check"></i> Gunakan Template
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" th:id="'modalUpdate' + ${tpl.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <div class="modal-header border-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="lingkaran-ikon-hijau" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                                <i class="bx bx-edit-alt"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-dark">Edit Template Pemasukan</h5>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/templateTransaksi/update/{id}(id=${tpl.id})}" method="post">
+                        <div class="modal-body pt-3">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Nama Template</label>
+                                <input type="text" name="nama" class="form-control rounded-3" th:value="${tpl.nama}" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Jumlah Nominal</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 fw-bold text-secondary" style="border-radius: 8px 0 0 8px;">Rp</span>
+                                    <input type="number" name="jumlah" class="form-control rounded-end-3 angka-tabel" th:value="${tpl.jumlah}" min="1" required />
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Kategori</label>
+                                <select name="kategoriId" class="form-select rounded-3">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    <option th:each="k : ${kategoriList}" th:value="${k.id}" th:text="${k.nama}" th:selected="${tpl.kategori != null and tpl.kategori.id == k.id}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Keterangan</label>
+                                <input type="text" name="keterangan" class="form-control rounded-3" th:value="${tpl.keterangan}" placeholder="Deskripsi ringkas transaksi" />
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="tombol-utama py-2 px-4 small" style="border-radius: 8px !important;">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:each="tpl : ${templatePengeluaran}">
+        <div class="modal fade" th:id="'modalDetail' + ${tpl.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <div class="modal-header border-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="lingkaran-ikon-merah" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                                <i class="bx bx-bookmark"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-dark">Detail Template Pengeluaran</h5>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-3">
+                        <div class="p-3 bg-light rounded-3 mb-3">
+                            <small class="text-muted d-block mb-1">Nama Template</small>
+                            <h6 class="fw-bold text-dark mb-0" th:text="${tpl.nama}">Nama Template</h6>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <small class="text-muted d-block mb-1">Jumlah Nominal</small>
+                                    <span class="fw-bold text-danger angka-tabel" th:text="'Rp ' + ${#numbers.formatDecimal(tpl.jumlah != null ? tpl.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <small class="text-muted d-block mb-1">Kategori</small>
+                                    <span class="badge rounded-pill bg-label-danger text-danger px-2 py-1 small" th:text="${tpl.kategori != null ? tpl.kategori.nama : 'Tanpa Kategori'}">Kategori</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3">
+                            <small class="text-muted d-block mb-1">Keterangan</small>
+                            <p class="mb-0 small text-dark" th:text="${tpl.keterangan != null and !#strings.isEmpty(tpl.keterangan) ? tpl.keterangan : '-'}">-</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Tutup</button>
+                        <form th:action="@{/templateTransaksi/gunakan/{id}(id=${tpl.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger py-2 px-4 small fw-semibold shadow-none" style="background-color: #E11D48; border-color: #E11D48; border-radius: 8px !important;">
+                                <i class="bx bx-check"></i> Gunakan Template
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" th:id="'modalUpdate' + ${tpl.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <div class="modal-header border-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="lingkaran-ikon-merah" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                                <i class="bx bx-edit-alt"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-dark">Edit Template Pengeluaran</h5>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/templateTransaksi/update/{id}(id=${tpl.id})}" method="post">
+                        <div class="modal-body pt-3">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Nama Template</label>
+                                <input type="text" name="nama" class="form-control rounded-3" th:value="${tpl.nama}" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Jumlah Nominal</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 fw-bold text-secondary" style="border-radius: 8px 0 0 8px;">Rp</span>
+                                    <input type="number" name="jumlah" class="form-control rounded-end-3 angka-tabel" th:value="${tpl.jumlah}" min="1" required />
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Kategori</label>
+                                <select name="kategoriId" class="form-select rounded-3">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    <option th:each="k : ${kategoriList}" th:value="${k.id}" th:text="${k.nama}" th:selected="${tpl.kategori != null and tpl.kategori.id == k.id}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Keterangan</label>
+                                <input type="text" name="keterangan" class="form-control rounded-3" th:value="${tpl.keterangan}" placeholder="Deskripsi ringkas transaksi" />
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-danger py-2 px-4 small fw-semibold shadow-none" style="background-color: #E11D48; border-color: #E11D48; border-radius: 8px !important;">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="modal fade" id="modalPemasukan" tabindex="-1" aria-labelledby="modalPemasukanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="lingkaran-ikon-hijau" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                            <i class="bx bx-plus-circle"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold text-dark" id="modalPemasukanLabel">Tambah Template Pemasukan</h5>
+                    </div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/templateTransaksi/simpan}" method="post">
+                    <input type="hidden" name="jenis" value="PEMASUKAN" />
+                    <div class="modal-body pt-3">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Nama Template</label>
+                            <input type="text" name="nama" class="form-control rounded-3" placeholder="Contoh: Gaji Bulanan, Bonus Proyek" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Jumlah Nominal</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 fw-bold text-secondary" style="border-radius: 8px 0 0 8px;">Rp</span>
+                                <input type="number" name="jumlah" class="form-control rounded-end-3 angka-tabel" placeholder="0" min="1" required />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Kategori</label>
+                            <select name="kategoriId" class="form-select rounded-3">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option th:each="k : ${kategoriList}" th:value="${k.id}" th:text="${k.nama}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Keterangan</label>
+                            <input type="text" name="keterangan" class="form-control rounded-3" placeholder="Deskripsi ringkas transaksi" />
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="tombol-utama py-2 px-4 small" style="border-radius: 8px !important;">Simpan Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPengeluaran" tabindex="-1" aria-labelledby="modalPengeluaranLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 18px; border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="lingkaran-ikon-merah" style="width: 36px; height: 36px; font-size: 1.2rem;">
+                            <i class="bx bx-minus-circle"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold text-dark" id="modalPengeluaranLabel">Tambah Template Pengeluaran</h5>
+                    </div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/templateTransaksi/simpan}" method="post">
+                    <input type="hidden" name="jenis" value="PENGELUARAN" />
+                    <div class="modal-body pt-3">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Nama Template</label>
+                            <input type="text" name="nama" class="form-control rounded-3" placeholder="Contoh: Makan Siang, Bayar Wifi, Uang Kos" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Jumlah Nominal</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 fw-bold text-secondary" style="border-radius: 8px 0 0 8px;">Rp</span>
+                                <input type="number" name="jumlah" class="form-control rounded-end-3 angka-tabel" placeholder="0" min="1" required />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Kategori</label>
+                            <select name="kategoriId" class="form-select rounded-3">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option th:each="k : ${kategoriList}" th:value="${k.id}" th:text="${k.nama}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Keterangan</label>
+                            <input type="text" name="keterangan" class="form-control rounded-3" placeholder="Deskripsi ringkas transaksi" />
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="tombol-putih py-2 px-3 small" style="border-radius: 8px !important;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger py-2 px-4 small fw-semibold shadow-none" style="background-color: #E11D48; border-color: #E11D48; border-radius: 8px !important;">Simpan Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

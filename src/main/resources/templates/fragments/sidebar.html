@@ -3,25 +3,27 @@
 <body>
     <th:block th:fragment="sidebar(halamanAktif)">
         <div class="bar-mobile-atas">
-            <button type="button" class="tombol-menu-mobile" id="tombolBukaMobile" aria-label="Buka Menu" title="Buka Menu">
-                <i class="bx bx-menu"></i>
-            </button>
             <a th:href="@{/dashboard}" class="tautan-brand-mobile">
-                <img th:src="@{/images/logo.png}" alt="SakuKita" class="logo-mobile" />
+                <img th:src="@{/images/logo1.png}" alt="SakuKita" class="logo-mobile" />
             </a>
-            <div class="ruang-kosong-mobile"></div>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/logout}" class="btn-logout-mobile" title="Keluar dari Akun" aria-label="Logout">
+                    <i class="bx bx-log-out"></i>
+                </a>
+            </div>
         </div>
-
-        <div class="latar-belakang-mobile" id="latarMobile"></div>
 
         <aside class="sidebar-kapsul" id="sidebarKapsul">
             <div>
                 <div class="area-brand-kapsul">
-                    <a th:href="@{/dashboard}" class="tautan-brand-kapsul" id="tautanBrand">
-                        <img th:src="@{/images/logo.png}" alt="SakuKita" class="logo-kapsul-panjang" id="logoPanjang" />
+                    <a th:href="@{/dashboard}" class="tautan-brand-kapsul" id="tautanBrand" aria-label="Kecilkan Menu" title="Kecilkan Menu">
+                        <div class="logo-card-sidebar">
+                            <img th:src="@{/images/logoutama.png}" alt="SakuKita" class="logo-kapsul-panjang" id="logoPanjang" />
+                            <img th:src="@{/images/logo1.png}" alt="SakuKita" class="logo-kapsul-kecil" />
+                        </div>
                     </a>
-                    <button type="button" class="tombol-toggle-kapsul" id="tombolToggleSidebar" aria-label="Menu" title="Menu Sidebar">
-                        <i class="bx bx-menu"></i>
+                    <button type="button" class="tombol-toggle-kapsul" id="tombolToggleSidebar" aria-label="Kecilkan Menu" title="Kecilkan Menu">
+                        <i class="bx bx-chevrons-left" id="ikonToggleSidebar"></i>
                     </button>
                 </div>
 
@@ -51,6 +53,12 @@
                         </a>
                     </li>
                     <li>
+                        <a th:href="@{/templateTransaksi}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'templateTransaksi'} ? 'menu-kapsul-aktif' : ''" title="Template Transaksi">
+                            <span class="ikon-menu-kapsul"><i class="bx bx-bookmark"></i></span>
+                            <span class="teks-menu-kapsul">Template</span>
+                        </a>
+                    </li>
+                    <li>
                         <a th:href="@{/laporan}" class="tautan-menu-kapsul" th:classappend="${halamanAktif == 'laporan'} ? 'menu-kapsul-aktif' : ''" title="Laporan">
                             <span class="ikon-menu-kapsul"><i class="bx bx-bar-chart-alt-2"></i></span>
                             <span class="teks-menu-kapsul">Laporan</span>
@@ -58,63 +66,90 @@
                     </li>
                 </ul>
             </div>
-
-            <div class="area-keluar">
-                <a th:href="@{/logout}" class="tautan-menu-kapsul text-danger" title="Keluar">
-                    <span class="ikon-menu-kapsul"><i class="bx bx-power-off"></i></span>
-                    <span class="teks-menu-kapsul">Keluar</span>
-                </a>
-            </div>
         </aside>
+
+        <nav class="nav-bawah-mobile" aria-label="Navigasi Bawah Mobile">
+            <a th:href="@{/pemasukan}" class="item-nav-bawah" th:classappend="${halamanAktif == 'pemasukan'} ? 'item-nav-bawah-aktif' : ''">
+                <div class="wadah-ikon-nav-bawah">
+                    <i class="bx bx-trending-up"></i>
+                </div>
+                <span class="label-nav-bawah">Masuk</span>
+            </a>
+            <a th:href="@{/pengeluaran}" class="item-nav-bawah" th:classappend="${halamanAktif == 'pengeluaran'} ? 'item-nav-bawah-aktif' : ''">
+                <div class="wadah-ikon-nav-bawah">
+                    <i class="bx bx-trending-down"></i>
+                </div>
+                <span class="label-nav-bawah">Keluar</span>
+            </a>
+            <a th:href="@{/dashboard}" class="item-nav-bawah" th:classappend="${halamanAktif == 'dashboard'} ? 'item-nav-bawah-aktif' : ''">
+                <div class="wadah-ikon-nav-bawah">
+                    <i class="bx bx-home-circle"></i>
+                </div>
+                <span class="label-nav-bawah">Beranda</span>
+            </a>
+            <a th:href="@{/kategori}" class="item-nav-bawah" th:classappend="${halamanAktif == 'kategori'} ? 'item-nav-bawah-aktif' : ''">
+                <div class="wadah-ikon-nav-bawah">
+                    <i class="bx bx-grid-alt"></i>
+                </div>
+                <span class="label-nav-bawah">Kategori</span>
+            </a>
+            <a th:href="@{/laporan}" class="item-nav-bawah" th:classappend="${halamanAktif == 'laporan'} ? 'item-nav-bawah-aktif' : ''">
+                <div class="wadah-ikon-nav-bawah">
+                    <i class="bx bx-bar-chart-alt-2"></i>
+                </div>
+                <span class="label-nav-bawah">Laporan</span>
+            </a>
+        </nav>
 
         <script>
             (function () {
                 const sidebar = document.getElementById('sidebarKapsul');
                 const tombolToggle = document.getElementById('tombolToggleSidebar');
-                const tombolBukaMobile = document.getElementById('tombolBukaMobile');
-                const latarMobile = document.getElementById('latarMobile');
                 const tautanBrand = document.getElementById('tautanBrand');
+                const ikonToggle = document.getElementById('ikonToggleSidebar');
                 const teksMenu = document.querySelectorAll('.teks-menu-kapsul');
                 let isCollapsed = false;
 
-                function bukaSidebarMobile() {
-                    if (sidebar) sidebar.classList.add('sidebar-kapsul-terbuka-mobile');
-                    if (latarMobile) latarMobile.classList.add('latar-belakang-mobile-aktif');
-                    document.body.style.overflow = 'hidden';
+                function kecilkanSidebarDesktop() {
+                    isCollapsed = true;
+                    if (sidebar) sidebar.classList.add('sidebar-kapsul-ringkas');
+                    teksMenu.forEach(el => el.style.display = 'none');
+                    if (tombolToggle) tombolToggle.setAttribute('title', 'Buka Menu');
+                    if (ikonToggle) {
+                        ikonToggle.classList.remove('bx-chevrons-left');
+                        ikonToggle.classList.add('bx-chevrons-right');
+                    }
                 }
 
-                function tutupSidebarMobile() {
-                    if (sidebar) sidebar.classList.remove('sidebar-kapsul-terbuka-mobile');
-                    if (latarMobile) latarMobile.classList.remove('latar-belakang-mobile-aktif');
-                    document.body.style.overflow = '';
+                function lebarkanSidebarDesktop() {
+                    isCollapsed = false;
+                    if (sidebar) sidebar.classList.remove('sidebar-kapsul-ringkas');
+                    teksMenu.forEach(el => el.style.display = 'inline');
+                    if (tombolToggle) tombolToggle.setAttribute('title', 'Kecilkan Menu');
+                    if (ikonToggle) {
+                        ikonToggle.classList.remove('bx-chevrons-right');
+                        ikonToggle.classList.add('bx-chevrons-left');
+                    }
                 }
 
-                if (tombolBukaMobile) {
-                    tombolBukaMobile.addEventListener('click', bukaSidebarMobile);
-                }
-
-                if (latarMobile) {
-                    latarMobile.addEventListener('click', tutupSidebarMobile);
+                if (tautanBrand) {
+                    tautanBrand.addEventListener('click', function (e) {
+                        if (window.innerWidth >= 992) {
+                            e.preventDefault();
+                            kecilkanSidebarDesktop();
+                        }
+                    });
                 }
 
                 if (tombolToggle && !tombolToggle.dataset.toggleInitialized) {
                     tombolToggle.dataset.toggleInitialized = 'true';
                     tombolToggle.addEventListener('click', function () {
-                        if (window.innerWidth < 992) {
-                            tutupSidebarMobile();
-                            return;
-                        }
-                        isCollapsed = !isCollapsed;
-                        if (isCollapsed) {
-                            sidebar.classList.add('sidebar-kapsul-ringkas');
-                            if (tautanBrand) tautanBrand.style.display = 'none';
-                            teksMenu.forEach(el => el.style.display = 'none');
-                            tombolToggle.setAttribute('title', 'Buka Menu');
-                        } else {
-                            sidebar.classList.remove('sidebar-kapsul-ringkas');
-                            if (tautanBrand) tautanBrand.style.display = 'flex';
-                            teksMenu.forEach(el => el.style.display = 'inline');
-                            tombolToggle.setAttribute('title', 'Tutup Menu');
+                        if (window.innerWidth >= 992) {
+                            if (isCollapsed) {
+                                lebarkanSidebarDesktop();
+                            } else {
+                                kecilkanSidebarDesktop();
+                            }
                         }
                     });
                 }

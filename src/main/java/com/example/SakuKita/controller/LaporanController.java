@@ -25,13 +25,28 @@ public class LaporanController {
         this.kategoriService = kategoriService;
     }
 
-    @GetMapping("/laporan")
-    public String halamanLaporan(@RequestParam(defaultValue = "bulan") String periode, HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/login";
-        List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
-        List<Transaksi> filteredTx = transaksiService.filterTransaksi(userTx, periode);
-        model.addAttribute("transaksi", filteredTx);
+   @GetMapping("/laporan")
+public String halamanLaporan( @RequestParam(defaultValue = "bulan") String periode, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        return "redirect:/login";
+    }
+    List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
+    List<Transaksi> filteredTx = transaksiService.filterTransaksi(userTx, periode);
+    int pageSize = 10;
+    int totalItems = filteredTx.size();
+    int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));
+    page = Math.max(1, Math.min(page, totalPages));
+    int fromIndex = (page - 1) * pageSize;
+    int toIndex = Math.min(fromIndex + pageSize, totalItems);
+    List<Transaksi> pagedTx = filteredTx.subList(fromIndex, toIndex);
+
+        model.addAttribute("transaksi", pagedTx);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("fromIndex", totalItems == 0 ? 0 : fromIndex + 1);
+        model.addAttribute("toIndex", toIndex);
         model.addAttribute("totalPemasukan", transaksiService.totalPemasukan(user, periode));
         model.addAttribute("totalPengeluaran", transaksiService.totalPengeluaran(user, periode));
         model.addAttribute("periode", periode);

@@ -26,69 +26,132 @@
         </div>
     </header>
 
-    <main class="flex-grow-1 d-flex flex-column justify-content-center py-5">
+    <main class="flex-grow-1 d-flex flex-column justify-content-center py-4 py-lg-5">
         <div class="container">
-            <div class="row align-items-center g-4 g-lg-5">
-                <div class="col-lg-6 order-2 order-lg-1 text-center text-lg-start">
-                    <h1 class="font-judul display-5 fw-bold mb-3 lh-tight text-white">
+            <div class="d-lg-none">
+                <div class="text-center mb-4">
+                    <h1 class="display-6 fw-bold mb-3 lh-tight text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                         Kelola Finansial Lebih Terarah Bersama <span style="color: #34D399;">SakuKita</span>
                     </h1>
-                    <p class="fs-6 mb-4 lh-relaxed" style="color: #E6F4EF; max-width: 500px;">
+                    <p class="fs-6 mb-4 lh-relaxed mx-auto" style="color: #E6F4EF; max-width: 500px;">
                         Catat pemasukan, pantau pengeluaran harian, dan ketahui kondisi saldo Anda secara riil dalam satu tempat yang rapi, aman, dan mudah digunakan.
                     </p>
-                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start gap-3">
-                        <a th:href="@{/register}" class="tombol-putih py-2 px-4 text-decoration-none d-inline-flex align-items-center gap-2 shadow-sm">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-sm-3">
+                        <a th:href="@{/register}" class="tombol-putih py-2 px-3 px-sm-4 text-decoration-none d-inline-flex align-items-center gap-2 shadow-sm">
                             <span>Mulai Sekarang</span>
                             <i class="bi bi-arrow-right"></i>
                         </a>
-                        <a th:href="@{/login}" class="btn py-2 px-4 text-decoration-none fw-semibold rounded-pill" style="border: 1px solid rgba(255, 255, 255, 0.45); color: #FFFFFF;">
+                        <a th:href="@{/login}" class="btn py-2 px-3 px-sm-4 text-decoration-none fw-semibold hero-btn-outline">
                             <span>Masuk ke Akun</span>
                         </a>
                     </div>
                 </div>
 
-                <div class="col-lg-6 order-1 order-lg-2 text-center position-relative">
-                    <div class="position-absolute top-50 start-50 translate-middle rounded-circle" style="width: 340px; height: 340px; background: radial-gradient(circle, rgba(52, 211, 153, 0.2) 0%, rgba(15, 61, 50, 0) 70%); z-index: 0; pointer-events: none;"></div>
-                    <img th:src="@{/images/utama.png}" alt="Ilustrasi Finansial SakuKita" class="img-fluid position-relative" style="max-height: 390px; width: auto; z-index: 1;">
+                <div class="hero-visual-container">
+                    <div class="hero-glow-bg"></div>
+                    <img th:src="@{/images/utama.png}" alt="Ilustrasi Finansial SakuKita" class="hero-coin-bg">
+                    <div class="hero-cards-stack">
+                        <div class="hero-glass-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="hero-card-icon flex-shrink-0">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1" style="font-size: 0.95rem;">Pencatatan Rapi</h6>
+                                    <p class="mb-0" style="color: #A7F3D0; font-size: 0.825rem; line-height: 1.4;">Catat transaksi pemasukan &amp; pengeluaran dengan presisi.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kartu 2: Analisis Arus Kas -->
+                        <div class="hero-glass-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="hero-card-icon flex-shrink-0">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1" style="font-size: 0.95rem;">Analisis Arus Kas</h6>
+                                    <p class="mb-0" style="color: #A7F3D0; font-size: 0.825rem; line-height: 1.4;">Grafik &amp; riwayat saldo terperinci untuk evaluasi bulanan.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kartu 3: Privat & Aman -->
+                        <div class="hero-glass-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="hero-card-icon flex-shrink-0">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1" style="font-size: 0.95rem;">Privat &amp; Aman</h6>
+                                    <p class="mb-0" style="color: #A7F3D0; font-size: 0.825rem; line-height: 1.4;">Keamanan akun terjamin dan privasi data terjaga.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="d-none d-lg-block">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="font-judul display-5 fw-bold mb-3 lh-tight text-white">
+                            Kelola Finansial Lebih Terarah Bersama <span style="color: #34D399;">SakuKita</span>
+                        </h1>
+                        <p class="fs-6 mb-4 lh-relaxed" style="color: #E6F4EF; max-width: 500px;">
+                            Catat pemasukan, pantau pengeluaran harian, dan ketahui kondisi saldo Anda secara riil dalam satu tempat yang rapi, aman, dan mudah digunakan.
+                        </p>
+                        <div class="d-flex align-items-center gap-3">
+                            <a th:href="@{/register}" class="tombol-putih py-2 px-4 text-decoration-none d-inline-flex align-items-center gap-2 shadow-sm">
+                                <span>Mulai Sekarang</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <a th:href="@{/login}" class="btn py-2 px-4 text-decoration-none fw-semibold rounded-pill" style="border: 1px solid rgba(255, 255, 255, 0.45); color: #FFFFFF;">
+                                <span>Masuk ke Akun</span>
+                            </a>
+                        </div>
+                    </div>
 
-            <div class="row g-3 mt-4 pt-lg-3">
-                <div class="col-12 col-md-4">
-                    <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
-                                <i class="bi bi-wallet2 fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white fw-bold mb-1 fs-6">Pencatatan Rapi</h6>
-                                <p class="small mb-0" style="color: #A7F3D0;">Catat transaksi pemasukan &amp; pengeluaran dengan presisi.</p>
+                    <div class="col-lg-6 text-center position-relative">
+                        <div class="position-absolute top-50 start-50 translate-middle rounded-circle" style="width: 340px; height: 340px; background: radial-gradient(circle, rgba(52, 211, 153, 0.2) 0%, rgba(15, 61, 50, 0) 70%); z-index: 0; pointer-events: none;"></div>
+                        <img th:src="@{/images/utama.png}" alt="Ilustrasi Finansial SakuKita" class="img-fluid position-relative" style="max-height: 390px; width: auto; z-index: 1;">
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-4 pt-3">
+                    <div class="col-4">
+                        <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
+                                    <i class="bi bi-wallet2 fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1 fs-6">Pencatatan Rapi</h6>
+                                    <p class="small mb-0" style="color: #A7F3D0;">Catat transaksi pemasukan &amp; pengeluaran dengan presisi.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
-                                <i class="bi bi-graph-up-arrow fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white fw-bold mb-1 fs-6">Analisis Arus Kas</h6>
-                                <p class="small mb-0" style="color: #A7F3D0;">Grafik &amp; riwayat saldo terperinci untuk evaluasi bulanan.</p>
+                    <div class="col-4">
+                        <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
+                                    <i class="bi bi-graph-up-arrow fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1 fs-6">Analisis Arus Kas</h6>
+                                    <p class="small mb-0" style="color: #A7F3D0;">Grafik &amp; riwayat saldo terperinci untuk evaluasi bulanan.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
-                                <i class="bi bi-shield-lock-fill fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white fw-bold mb-1 fs-6">Privat &amp; Aman</h6>
-                                <p class="small mb-0" style="color: #A7F3D0;">Keamanan akun terjamin dan privasi data terjaga aman.</p>
+                    <div class="col-4">
+                        <div class="p-3 rounded-4 h-100" style="background-color: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(52, 211, 153, 0.2); color: #34D399;">
+                                    <i class="bi bi-shield-check fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-1 fs-6">Privat &amp; Aman</h6>
+                                    <p class="small mb-0" style="color: #A7F3D0;">Keamanan akun terjamin dan privasi data terjaga aman.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

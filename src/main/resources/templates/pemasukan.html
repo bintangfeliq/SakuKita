@@ -123,14 +123,12 @@
                         pemasukan bulan ini
                     </span>
 
-                    <div class="pt-2 border-top-matte d-flex align-items-center flex-wrap gap-2">
-                        <a th:href="@{/tambahPemasukan}" class="tombol-putih text-decoration-none py-1 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem; border-radius: 9999px;">
-                            <i class="bx bx-plus" style="font-size: 0.95rem;"></i>
+                    <div class="pt-2 border-top-matte d-flex align-items-center gap-2">
+                        <a th:href="@{/tambahPemasukan}" class="btn btn-sm btn-light rounded-pill text-decoration-none d-flex align-items-center justify-content-center flex-fill text-center fw-semibold" style="font-size: 0.72rem; color: #0F3D32; background-color: #FFFFFF; border: 1px solid #FFFFFF; white-space: nowrap;">
                             <span>Tambah Pemasukan</span>
                         </a>
-                        <div th:if="${templatesPemasukan != null and !#lists.isEmpty(templatesPemasukan)}" class="dropdown">
-                            <button class="btn btn-sm btn-outline-light rounded-pill px-2.5 py-1 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.78rem; background: rgba(255, 255, 255, 0.12);">
-                                <i class="bx bx-bookmark" style="font-size: 0.9rem;"></i>
+                        <div th:if="${templatesPemasukan != null and !#lists.isEmpty(templatesPemasukan)}" class="dropdown flex-fill">
+                            <button class="btn btn-sm btn-outline-light rounded-pill dropdown-toggle d-flex align-items-center justify-content-center w-100 text-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; background: rgba(255, 255, 255, 0.12); white-space: nowrap;">
                                 <span>Gunakan Template</span>
                             </button>
                             <ul class="dropdown-menu shadow border-0 py-1" style="border-radius: 12px; min-width: 210px;">
@@ -146,51 +144,86 @@
                 </div>
             </div>
 
-            <div class="card kartu-konten p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <section class="card p-0 border shadow-none overflow-hidden" style="border-radius: 14px; border-color: #E2E8F0; background: #FFFFFF;">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="lingkaran-ikon-hijau">
+                        <div class="lingkaran-ikon-hijau flex-shrink-0" style="width: 28px; height: 28px; font-size: 0.95rem; border-radius: 7px;">
                             <i class="bx bx-history"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-0 text-dark">Riwayat Pemasukan</h5>
+                            <h6 class="fw-bold mb-0 text-dark">Riwayat Pemasukan</h6>
+                            <small class="text-muted d-none d-sm-inline" style="font-size: 0.78rem;">Catatan mutasi pemasukan keuangan Anda</small>
                         </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="lencana-metrik-hijau">
-                            <span th:text="${totalItems != null ? totalItems : (transaksi != null ? #lists.size(transaksi) : 0)} + ' Catatan'">0 Catatan</span>
-                        </span>
                     </div>
                 </div>
 
-                <div th:if="${transaksi != null and !#lists.isEmpty(transaksi)}" class="table-responsive">
+                <div class="table-responsive text-nowrap">
                     <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr class="text-muted small border-bottom">
-                                <th>TANGGAL</th>
-                                <th>KATEGORI</th>
-                                <th>KETERANGAN</th>
-                                <th class="text-end">JUMLAH</th>
+                        <thead style="background-color: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+                            <tr>
+                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Keterangan</th>
+                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Kategori</th>
+                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tanggal</th>
+                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Status</th>
+                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase text-end" style="font-size: 0.75rem; letter-spacing: 0.5px;">Nominal</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="border-top-0">
                             <tr th:each="p : ${transaksi}">
-                                <td class="text-muted small" th:text="${p.tanggal != null ? #temporals.format(p.tanggal, 'dd MMM yyyy, HH:mm') : '-'}">01 Jan 2026, 10:00</td>
-                                <td>
-                                    <span class="text-success" th:text="${p.kategori != null ? p.kategori : 'Lainnya'}">Kategori</span>
+                                <td class="py-2.5 px-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="lingkaran-ikon-kecil laporan-tabel-ikon flex-shrink-0 lingkaran-ikon-hijau">
+                                            <i class="bx bx-up-arrow-alt"></i>
+                                        </div>
+                                        <span class="fw-semibold text-dark small laporan-tabel-keterangan" th:text="${p.keterangan}">
+                                            Keterangan
+                                        </span>
+                                    </div>
                                 </td>
-                                <td>
-                                    <span class="fw-semibold text-dark" th:text="${p.keterangan}">Keterangan</span>
+                                <td class="py-2.5 px-3">
+                                    <span class="badge border fw-medium px-2 py-0.5 text-secondary" style="background-color: #F8FAFC; border-color: #E2E8F0 !important; font-size: 0.75rem; border-radius: 6px;" th:text="${p.kategori != null and !#strings.isEmpty(p.kategori) ? p.kategori : 'Lainnya'}">
+                                        Kategori
+                                    </span>
                                 </td>
-                                <td class="text-end">
-                                    <span class="fw-bold angka-tabel text-success" th:text="'+ Rp ' + ${#numbers.formatDecimal(p.jumlah != null ? p.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">+ Rp 0</span>
+                                <td class="py-2.5 px-3">
+                                    <span class="text-muted small" style="font-size: 0.78rem;" th:text="${p.tanggal != null ? #temporals.format(p.tanggal, 'dd MMM yyyy, HH:mm') : '-'}">
+                                        Tanggal
+                                    </span>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="badge fw-medium px-2 py-0.5" style="background-color: #E6F4EF; color: #0F3D32; font-size: 0.75rem; border-radius: 6px;">
+                                        Pemasukan
+                                    </span>
+                                </td>
+                                <td class="py-2.5 px-3 text-end fw-bold small text-success angka-tabel" th:text="'+ Rp ' + ${#numbers.formatDecimal(p.jumlah != null ? p.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">
+                                    + Rp 0
+                                </td>
+                            </tr>
+
+                            <tr th:if="${transaksi == null or #lists.isEmpty(transaksi)}">
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <div class="d-flex flex-column align-items-center justify-content-center py-2">
+                                        <div class="mb-2 d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background-color: #F1F5F9; color: #64748B;">
+                                            <i class="bx bx-receipt fs-3"></i>
+                                        </div>
+                                        <span class="fw-semibold text-dark mb-1 small">
+                                            Belum ada aktivitas pemasukan
+                                        </span>
+                                        <small class="text-muted mb-3" style="font-size: 0.78rem;">
+                                            Mulai catat pemasukan pertama Anda untuk memantau keuangan.
+                                        </small>
+                                        <a th:href="@{/tambahPemasukan}" class="tombol-utama py-1.5 px-3 small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.8rem; border-radius: 8px !important;">
+                                            <i class="bx bx-plus-circle"></i>
+                                            <span>Tambah Pemasukan</span>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div th:if="${totalPages != null and totalPages > 1}" class="d-flex justify-content-center align-items-center mt-3 pt-3 border-top">
+                <div th:if="${totalPages != null and totalPages > 1}" class="p-3 border-top d-flex justify-content-center align-items-center">
                     <nav aria-label="Navigasi Halaman" class="overflow-auto max-w-100">
                         <ul class="pagination pagination-sm mb-0 justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
@@ -209,15 +242,7 @@
                         </ul>
                     </nav>
                 </div>
-
-                <div th:if="${transaksi == null or #lists.isEmpty(transaksi)}" class="text-center py-5">
-                    <div class="lingkaran-ikon-hijau mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
-                        <i class="bx bx-wallet"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-1">Belum Ada Data Pemasukan</h6>
-                    <p class="text-muted small mb-0">Seluruh catatan pemasukan Anda akan ditampilkan di sini.</p>
-                </div>
-            </div>
+            </section>
         </main>
     </div>
 

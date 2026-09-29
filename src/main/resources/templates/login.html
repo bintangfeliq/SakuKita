@@ -14,8 +14,8 @@
         <div class="row g-0 layar-belah">
             <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-start p-5 sisi-hijau">
                 <div class="mb-5 pt-3">
-                    <a th:href="@{/}" class="kartu-logo">
-                        <img th:src="@{/images/logoutama.png}" alt="SakuKita" style="height: 34px; width: auto; display: block;">
+                    <a th:href="@{/}" class="d-inline-flex align-items-center text-decoration-none">
+                        <img th:src="@{/images/logoutama.png}" alt="SakuKita" style="height: 36px; width: auto; display: block; filter: brightness(0) invert(1);">
                     </a>
                 </div>
                 <div class="px-xl-2" style="max-width: 520px;">
@@ -28,15 +28,14 @@
                 </div>
             </div>
 
-            <div class="col-lg-6 d-flex flex-column justify-content-between justify-content-lg-center align-items-center p-4 p-md-5 sisi-form position-relative">
-                <div class="d-lg-none w-100 mb-4 text-start">
-                    <a th:href="@{/}" class="kartu-logo text-decoration-none" aria-label="SakuKita Home">
+            <div class="col-lg-6 d-flex flex-column justify-content-between justify-content-lg-start align-items-center px-4 py-3 py-lg-5 px-lg-5 sisi-form position-relative min-vh-100">
+                <div class="d-lg-none w-100 text-start pt-2">
+                    <a th:href="@{/}" class="d-inline-flex align-items-center text-decoration-none" aria-label="SakuKita Home">
                         <img th:src="@{/images/logoutama.png}" alt="SakuKita" style="height: 32px; width: auto; display: block;">
                     </a>
                 </div>
-
-                <div class="w-100 d-flex flex-column align-items-center my-auto my-lg-0">
-                    <div class="w-100 mb-3 mb-sm-4 text-start" style="max-width: 440px;">
+                <div class="w-100 d-flex flex-column align-items-center my-auto my-lg-0 pt-lg-3" style="max-width: 440px;">
+                    <div class="w-100 mb-2 mb-sm-3 text-start">
                         <a th:href="@{/}" class="small fw-semibold text-decoration-none text-secondary d-inline-flex align-items-center">
                             <i class="bi bi-arrow-left me-1"></i><span>Kembali ke Beranda</span>
                         </a>
@@ -82,6 +81,7 @@
                     </form>
                 </div>
                 </div>
+                <div class="d-lg-none w-100" style="height: 32px;" aria-hidden="true"></div>
             </div>
         </div>
     </div>

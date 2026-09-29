@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -35,10 +35,10 @@
                 </div>
                 <div>
                     <button type="button"
-                        class="tombol-utama py-1.5 py-md-2 px-3 small text-decoration-none d-inline-flex align-items-center gap-1 shadow-sm"
-                        style="border-radius: 9999px; font-size: 0.8125rem;" data-bs-toggle="modal"
+                        class="tombol-utama tombol-tambah-kategori text-decoration-none d-inline-flex align-items-center gap-1 shadow-sm"
+                        data-bs-toggle="modal"
                         data-bs-target="#modalTambahKategori">
-                        <i class="bx bx-plus fs-5"></i>
+                        <i class="bx bx-plus" style="font-size: 0.95rem;"></i>
                         <span>Tambah Kategori</span>
                     </button>
                 </div>
@@ -49,11 +49,6 @@
                     class="px-3 pt-3 pb-3 p-md-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div class="d-flex align-items-center gap-2">
                         <h5 class="fw-bold text-dark mb-0 fs-6 fs-md-5">Daftar Kategori</h5>
-                        <span class="lencana-metrik-hijau py-0.5 px-2" style="font-size: 0.72rem;">
-                            <span
-                                th:text="${totalItems != null ? totalItems : (kategori != null ? #lists.size(kategori) : 0)} + ' Kategori'">0
-                                Kategori</span>
-                        </span>
                     </div>
 
                     <div class="d-none d-md-block w-100 w-md-auto flex-grow-1 flex-md-grow-0" style="max-width: 320px;">

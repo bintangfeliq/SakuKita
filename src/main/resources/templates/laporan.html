@@ -117,12 +117,12 @@
                                 <h6 class="fw-bold mb-0 text-dark laporan-chart-title">Arus Kas 1 Tahun Terakhir</h6>
                                 <small class="text-muted d-none d-md-inline" style="font-size: 0.78rem;">Tren pemasukan dan pengeluaran 12 bulan terakhir</small>
                             </div>
-                            <div class="d-flex gap-1 gap-md-2">
-                                <span class="badge laporan-chart-badge py-1 px-2.5" style="background-color: #E6F4EF; color: #0F3D32; font-size: 0.75rem; border-radius: 6px;">
-                                    <i class="bx bx-down-arrow-alt me-0.5"></i>Pemasukan
+                            <div class="d-flex gap-2">
+                                <span class="badge laporan-chart-badge py-1 px-2 px-md-2.5 d-inline-flex align-items-center gap-1" style="background-color: #E6F4EF; color: #0F3D32; font-size: 0.75rem; border-radius: 6px;">
+                                    <i class="bx bx-up-arrow-alt"></i><span>Pemasukan</span>
                                 </span>
-                                <span class="badge laporan-chart-badge py-1 px-2.5" style="background-color: #FEECEE; color: #E11D48; font-size: 0.75rem; border-radius: 6px;">
-                                    <i class="bx bx-up-arrow-alt me-0.5"></i>Pengeluaran
+                                <span class="badge laporan-chart-badge py-1 px-2 px-md-2.5 d-inline-flex align-items-center gap-1" style="background-color: #FEECEE; color: #E11D48; font-size: 0.75rem; border-radius: 6px;">
+                                    <i class="bx bx-down-arrow-alt"></i><span>Pengeluaran</span>
                                 </span>
                             </div>
                         </div>
@@ -189,11 +189,11 @@
                         <tbody class="border-top-0">
                             <tr th:each="t : ${transaksi}">
                                 <td class="py-2.5 px-3">
-                                    <div class="d-flex align-items-center gap-2.5">
-                                        <div class="lingkaran-ikon-kecil" style="width: 28px; height: 28px; font-size: 0.95rem; border-radius: 6px;" th:classappend="${t.jenis == 'PEMASUKAN'} ? 'lingkaran-ikon-hijau' : 'lingkaran-ikon-merah'">
+                                    <div class="d-flex align-items-center">
+                                        <div class="lingkaran-ikon-kecil laporan-tabel-ikon flex-shrink-0" th:classappend="${t.jenis == 'PEMASUKAN'} ? 'lingkaran-ikon-hijau' : 'lingkaran-ikon-merah'">
                                             <i th:class="${t.jenis == 'PEMASUKAN'} ? 'bx bx-up-arrow-alt' : 'bx bx-down-arrow-alt'"></i>
                                         </div>
-                                        <span class="fw-semibold text-dark small" th:text="${t.keterangan}">
+                                        <span class="fw-semibold text-dark small laporan-tabel-keterangan" th:text="${t.keterangan}">
                                             Keterangan
                                         </span>
                                     </div>
@@ -350,8 +350,12 @@
                             ? bulanLabels
                             : defaultMonths,
                         labels: {
+                            rotate: 0,
+                            rotateAlways: false,
+                            hideOverlappingLabels: true,
+                            trim: false,
                             style: {
-                                fontSize: '11px',
+                                fontSize: window.innerWidth < 400 ? '7.5px' : (window.innerWidth < 768 ? '8.5px' : '11px'),
                                 colors: '#64748B'
                             }
                         }
@@ -359,6 +363,15 @@
                     yaxis: {
                         labels: {
                             formatter: function (nilai) {
+                                if (window.innerWidth < 768) {
+                                    if (nilai >= 1000000) {
+                                        return (nilai / 1000000).toFixed(1) + ' jt';
+                                    }
+                                    if (nilai >= 1000) {
+                                        return (nilai / 1000).toFixed(0) + ' rb';
+                                    }
+                                    return '' + nilai;
+                                }
                                 if (nilai >= 1000000) {
                                     return 'Rp ' + (nilai / 1000000).toFixed(1) + ' jt';
                                 }
@@ -368,7 +381,7 @@
                                 return 'Rp ' + nilai;
                             },
                             style: {
-                                fontSize: '11px',
+                                fontSize: window.innerWidth < 400 ? '7.5px' : (window.innerWidth < 768 ? '8.5px' : '11px'),
                                 colors: '#64748B'
                             }
                         }
@@ -383,7 +396,75 @@
                                 return 'Rp ' + Number(val).toLocaleString('id-ID');
                             }
                         }
-                    }
+                    },
+                    responsive: [
+                        {
+                            breakpoint: 768,
+                            options: {
+                                chart: {
+                                    height: 180
+                                },
+                                xaxis: {
+                                    labels: {
+                                        rotate: 0,
+                                        hideOverlappingLabels: true,
+                                        style: {
+                                            fontSize: '8.5px'
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '8.5px'
+                                        },
+                                        formatter: function (nilai) {
+                                            if (nilai >= 1000000) {
+                                                return (nilai / 1000000).toFixed(1) + ' jt';
+                                            }
+                                            if (nilai >= 1000) {
+                                                return (nilai / 1000).toFixed(0) + ' rb';
+                                            }
+                                            return '' + nilai;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            breakpoint: 400,
+                            options: {
+                                chart: {
+                                    height: 175
+                                },
+                                xaxis: {
+                                    labels: {
+                                        rotate: 0,
+                                        hideOverlappingLabels: true,
+                                        style: {
+                                            fontSize: '7.5px'
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '7.5px'
+                                        },
+                                        formatter: function (nilai) {
+                                            if (nilai >= 1000000) {
+                                                return (nilai / 1000000).toFixed(0) + 'jt';
+                                            }
+                                            if (nilai >= 1000) {
+                                                return (nilai / 1000).toFixed(0) + 'rb';
+                                            }
+                                            return '' + nilai;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
                 };
 
                 chartArusKas = new ApexCharts(elGrafikArusKas, opsiArusKas);

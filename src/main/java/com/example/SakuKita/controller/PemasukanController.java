@@ -1,6 +1,8 @@
 package com.example.SakuKita.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -32,16 +34,36 @@ public class PemasukanController {
     }
 
     @GetMapping("/pemasukan")
-    public String halamanPemasukan(@RequestParam(defaultValue = "bulan") String periode, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
+    public String halamanPemasukan(
+            @RequestParam(required = false) Integer bulan,
+            @RequestParam(required = false) Integer tahun,
+            @RequestParam(defaultValue = "1") int page,
+            HttpSession session,
+            Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
-        List<Transaksi> transaksi = transaksiService.cariTransaksiUser(user).stream().filter(t -> "PEMASUKAN".equalsIgnoreCase(t.getJenis())).toList();
-        List<Transaksi> filtered = transaksiService.filterTransaksi(transaksi, periode);
+
+        LocalDate hariIni = LocalDate.now();
+        int bulanPilih = (bulan != null && bulan >= 1 && bulan <= 12) ? bulan : hariIni.getMonthValue();
+        int tahunPilih = (tahun != null && tahun >= 1900 && tahun <= 2100) ? tahun : hariIni.getYear();
+
+        List<Transaksi> semuaPemasukan = new ArrayList<>();
+        for (Transaksi t : transaksiService.cariTransaksiUser(user)) {
+            if ("PEMASUKAN".equalsIgnoreCase(t.getJenis())) {
+                semuaPemasukan.add(t);
+            }
+        }
+
+        List<Transaksi> filtered = transaksiService.filterTransaksiRentang(semuaPemasukan, bulanPilih, tahunPilih);
+        BigDecimal totalPemasukan = transaksiService.totalNominal(filtered);
+        String periodeJudul = transaksiService.buatTeksPeriode(semuaPemasukan, bulanPilih, tahunPilih);
+        List<Integer> daftarTahun = transaksiService.buatDaftarTahun(semuaPemasukan, tahunPilih);
+
         int pageSize = 10;
         int totalItems = filtered.size();
-        int totalPages = Math.max(1,(int) Math.ceil((double) totalItems / pageSize));
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));
         page = Math.max(1, Math.min(page, totalPages));
         int fromIndex = (page - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, totalItems);
@@ -54,9 +76,12 @@ public class PemasukanController {
         model.addAttribute("fromIndex", totalItems == 0 ? 0 : fromIndex + 1);
         model.addAttribute("toIndex", toIndex);
         model.addAttribute("kategori", kategoriService.cariKategoriUser(user));
-        model.addAttribute("totalPemasukan", transaksiService.totalPemasukan(user, periode));
-        model.addAttribute("periode", periode);
-        model.addAttribute("templatesPemasukan",templateTransaksiService.cariBerdasarkanJenis(user, "PEMASUKAN"));
+        model.addAttribute("totalPemasukan", totalPemasukan);
+        model.addAttribute("bulan", bulanPilih);
+        model.addAttribute("tahun", tahunPilih);
+        model.addAttribute("daftarTahun", daftarTahun);
+        model.addAttribute("periodeJudul", periodeJudul);
+        model.addAttribute("templatesPemasukan", templateTransaksiService.cariBerdasarkanJenis(user, "PEMASUKAN"));
         return "pemasukan";
     }
 

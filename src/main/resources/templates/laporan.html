@@ -21,40 +21,36 @@
         <main class="area-konten-dashboard">
             <div th:replace="~{fragments/alert :: alert}"></div>
 
-            <header class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-1 gap-md-2">
-                <div>
-                    <h2 class="h4 fw-bold text-dark mb-0 mb-md-1 laporan-judul">Laporan Keuangan</h2>
-                    <p class="text-muted small mb-0 d-none d-md-block" style="font-size: 0.82rem;">Ringkasan arus kas pemasukan dan pengeluaran akun Anda</p>
+            <header class="mb-3 mb-sm-4 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <div class="mb-1 mb-sm-0">
+                    <h2 class="h4 fw-bold text-dark mb-1 laporan-judul">Laporan Keuangan</h2>
+                    <p class="text-muted small mb-0 d-none d-sm-block" style="font-size: 0.82rem;">Ringkasan arus kas pemasukan dan pengeluaran akun Anda</p>
                 </div>
 
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 dropdown-toggle d-flex align-items-center gap-1 fw-medium laporan-filter-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.8rem; background: #FFFFFF; border-color: #CBD5E1;">
-                        <i class="bx bx-calendar text-muted"></i>
-                        <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua Waktu' : 'Bulan Ini')}">
-                            Bulan Ini
-                        </span>
+                <!-- Filter Laporan Sejajar dengan Title (Tanpa Card) -->
+                <form th:action="@{/laporan}" method="get" class="d-flex align-items-center gap-2 ms-sm-auto mb-0">
+                    <select name="bulan" aria-label="Bulan" class="form-select form-select-sm shadow-none" style="width: 130px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
+                        <option value="1" th:selected="${bulan == 1}">Januari</option>
+                        <option value="2" th:selected="${bulan == 2}">Februari</option>
+                        <option value="3" th:selected="${bulan == 3}">Maret</option>
+                        <option value="4" th:selected="${bulan == 4}">April</option>
+                        <option value="5" th:selected="${bulan == 5}">Mei</option>
+                        <option value="6" th:selected="${bulan == 6}">Juni</option>
+                        <option value="7" th:selected="${bulan == 7}">Juli</option>
+                        <option value="8" th:selected="${bulan == 8}">Agustus</option>
+                        <option value="9" th:selected="${bulan == 9}">September</option>
+                        <option value="10" th:selected="${bulan == 10}">Oktober</option>
+                        <option value="11" th:selected="${bulan == 11}">November</option>
+                        <option value="12" th:selected="${bulan == 12}">Desember</option>
+                    </select>
+                    <select name="tahun" aria-label="Tahun" class="form-select form-select-sm shadow-none" style="width: 88px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
+                        <option th:each="t : ${daftarTahun}" th:value="${t}" th:text="${t}" th:selected="${t == tahun}">2026</option>
+                    </select>
+                    <button type="submit" class="tombol-utama small d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap flex-shrink-0" style="height: 36px; border-radius: 8px !important; font-size: 0.82rem; font-weight: 600; padding: 0 14px;">
+                        <i class="bx bx-filter-alt"></i>
+                        <span>Filter</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-1" style="border-radius: 12px; min-width: 140px; border-color: #E2E8F0;">
-                        <li>
-                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'bulan' or periode == null} ? 'active' : ''" th:href="@{/laporan(periode='bulan')}">
-                                <span>Bulan Ini</span>
-                                <i class="bx bx-check" th:if="${periode == 'bulan' or periode == null}"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'tahun'} ? 'active' : ''" th:href="@{/laporan(periode='tahun')}">
-                                <span>Tahun Ini</span>
-                                <i class="bx bx-check" th:if="${periode == 'tahun'}"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'semua'} ? 'active' : ''" th:href="@{/laporan(periode='semua')}">
-                                <span>Semua Waktu</span>
-                                <i class="bx bx-check" th:if="${periode == 'semua'}"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                </form>
             </header>
 
             <section class="row g-2 g-md-3 mb-3">
@@ -75,7 +71,7 @@
                         <div>
                             <span class="lencana-metrik-hijau laporan-card-badge py-0.5 px-1.5 px-md-2 text-truncate d-inline-flex align-items-center" style="font-size: 0.7rem; max-width: 100%;">
                                 <i class="bx bx-up-arrow-alt me-0.5"></i>
-                                <span class="text-truncate" th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua Waktu' : 'Bulan Ini')}">
+                                <span class="text-truncate" th:text="${periodeJudul}">
                                     Bulan Ini
                                 </span>
                             </span>
@@ -100,7 +96,7 @@
                         <div>
                             <span class="lencana-metrik-merah laporan-card-badge py-0.5 px-1.5 px-md-2 text-truncate d-inline-flex align-items-center" style="font-size: 0.7rem; max-width: 100%;">
                                 <i class="bx bx-down-arrow-alt me-0.5"></i>
-                                <span class="text-truncate" th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua Waktu' : 'Bulan Ini')}">
+                                <span class="text-truncate" th:text="${periodeJudul}">
                                     Bulan Ini
                                 </span>
                             </span>
@@ -254,17 +250,17 @@
                     <nav aria-label="Navigasi Halaman" class="overflow-auto max-w-100">
                         <ul class="pagination pagination-sm mb-0 justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/laporan(periode=${periode}, page=${currentPage - 1})}" aria-label="Sebelumnya" title="Sebelumnya">
+                                <a class="page-link" th:href="@{/laporan(bulan=${bulan}, tahun=${tahun}, page=${currentPage - 1})}" aria-label="Sebelumnya" title="Sebelumnya">
                                     <i class="bx bx-chevron-left fs-5"></i>
                                 </a>
                             </li>
                             <li th:each="i : ${#numbers.sequence(1, totalPages)}" class="page-item" th:classappend="${currentPage == i} ? 'active' : ''">
-                                <a class="page-link" th:href="@{/laporan(periode=${periode}, page=${i})}" th:text="${i}">
+                                <a class="page-link" th:href="@{/laporan(bulan=${bulan}, tahun=${tahun}, page=${i})}" th:text="${i}">
                                     1
                                 </a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/laporan(periode=${periode}, page=${currentPage + 1})}" aria-label="Selanjutnya" title="Selanjutnya">
+                                <a class="page-link" th:href="@{/laporan(bulan=${bulan}, tahun=${tahun}, page=${currentPage + 1})}" aria-label="Selanjutnya" title="Selanjutnya">
                                     <i class="bx bx-chevron-right fs-5"></i>
                                 </a>
                             </li>

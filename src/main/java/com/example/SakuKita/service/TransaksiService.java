@@ -1,11 +1,11 @@
 package com.example.SakuKita.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,43 +62,128 @@ public class TransaksiService {
         return transaksiRepository.findTop5ByUserOrderByTanggalDescIdDesc(user);
     }
 
-    public List<Transaksi> filterTransaksi(List<Transaksi> transaksi, String periode) {
+    public LocalDateTime cariTanggalTransaksiAwal(List<Transaksi> transaksi) {
+        if (transaksi == null || transaksi.isEmpty()) {
+            return null;
+        }
+        LocalDateTime tanggalAwal = null;
+        for (Transaksi t : transaksi) {
+            if (t.getTanggal() != null) {
+                if (tanggalAwal == null || t.getTanggal().isBefore(tanggalAwal)) {
+                    tanggalAwal = t.getTanggal();
+                }
+            }
+        }
+        return tanggalAwal;
+    }
+
+    public List<Transaksi> filterTransaksiRentang(List<Transaksi> transaksi, int bulan, int tahun) {
         if (transaksi == null || transaksi.isEmpty()) {
             return List.of();
         }
-        if ("semua".equalsIgnoreCase(periode)) {
-            return transaksi;
+
+        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
+        if (tanggalAwal == null) {
+            return List.of();
         }
-        LocalDateTime sekarang = LocalDateTime.now();
-         return transaksi.stream()
-            .filter(t -> t.getTanggal() != null)
-            .filter(t -> t.getTanggal().getYear() == sekarang.getYear())
-            .filter(t -> "tahun".equalsIgnoreCase(periode) || t.getTanggal().getMonth() == sekarang.getMonth()).toList();
+        LocalDate startDate = LocalDate.of(tanggalAwal.getYear(), tanggalAwal.getMonthValue(), 1);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        YearMonth yearMonth = YearMonth.of(tahun, bulan);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59, 999999999);
+        if (endDate.isBefore(startDate)) {
+            return List.of();
+        }
+
+        List<Transaksi> hasil = new ArrayList<>();
+        for (Transaksi t : transaksi) {
+            if (t.getTanggal() != null) {
+                if (!t.getTanggal().isBefore(startDateTime) && !t.getTanggal().isAfter(endDateTime)) {
+                    hasil.add(t);
+                }
+            }
+        }
+        return hasil;
+    }
+
+    public String buatTeksPeriode(List<Transaksi> transaksi, int bulan, int tahun) {
+        String[] namaBulan = {
+            "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        };
+
+        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
+        if (tanggalAwal == null) {
+            return namaBulan[bulan] + " " + tahun;
+        }
+
+        LocalDate startDate = LocalDate.of(tanggalAwal.getYear(), tanggalAwal.getMonthValue(), 1);
+        YearMonth yearMonth = YearMonth.of(tahun, bulan);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        if (endDate.isBefore(startDate)) {
+            return namaBulan[bulan] + " " + tahun;
+        }
+
+        return namaBulan[startDate.getMonthValue()] + " " + startDate.getYear() + " - " + namaBulan[bulan] + " " + tahun;
+    }
+
+    public List<Integer> buatDaftarTahun(List<Transaksi> transaksi, int tahunPilihan) {
+        int tahunSekarang = LocalDate.now().getYear();
+        int tahunAwal = tahunSekarang;
+
+        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
+        if (tanggalAwal != null && tanggalAwal.getYear() < tahunAwal) {
+            tahunAwal = tanggalAwal.getYear();
+        }
+
+        int tahunAkhir = Math.max(tahunSekarang, tahunPilihan);
+        List<Integer> daftarTahun = new ArrayList<>();
+        for (int y = tahunAwal; y <= tahunAkhir; y++) {
+            daftarTahun.add(y);
+        }
+        return daftarTahun;
     }
 
     public BigDecimal totalNominal(List<Transaksi> transaksi) {
         if (transaksi == null || transaksi.isEmpty()) {
             return BigDecimal.ZERO;
         }
-        return transaksi.stream().map(t -> t.getJumlah()).filter(Objects::nonNull).reduce(BigDecimal.ZERO, (total, jumlah) -> total.add(jumlah));
-    }
-
-    public BigDecimal totalPemasukan(User user, String periode) {
-        List<Transaksi> transaksi = cariTransaksiUser(user).stream().filter(t -> "PEMASUKAN".equalsIgnoreCase(t.getJenis())).toList();
-        return totalNominal(filterTransaksi(transaksi, periode));
-    }
-
-    public BigDecimal totalPengeluaran(User user, String periode) {
-        List<Transaksi> transaksi = cariTransaksiUser(user).stream().filter(t -> "PENGELUARAN".equalsIgnoreCase(t.getJenis())).toList();
-        return totalNominal(filterTransaksi(transaksi, periode));
+        BigDecimal total = BigDecimal.ZERO;
+        for (Transaksi t : transaksi) {
+            if (t.getJumlah() != null) {
+                total = total.add(t.getJumlah());
+            }
+        }
+        return total;
     }
 
     public BigDecimal pemasukanBulanan(User user) {
-        return totalPemasukan(user, "bulan");
+        List<Transaksi> transaksi = cariTransaksiUser(user);
+        YearMonth sekarang = YearMonth.now();
+        BigDecimal total = BigDecimal.ZERO;
+        for (Transaksi t : transaksi) {
+            if ("PEMASUKAN".equalsIgnoreCase(t.getJenis()) && t.getTanggal() != null && t.getJumlah() != null) {
+                if (YearMonth.from(t.getTanggal()).equals(sekarang)) {
+                    total = total.add(t.getJumlah());
+                }
+            }
+        }
+        return total;
     }
 
     public BigDecimal pengeluaranBulanan(User user) {
-        return totalPengeluaran(user, "bulan");
+        List<Transaksi> transaksi = cariTransaksiUser(user);
+        YearMonth sekarang = YearMonth.now();
+        BigDecimal total = BigDecimal.ZERO;
+        for (Transaksi t : transaksi) {
+            if ("PENGELUARAN".equalsIgnoreCase(t.getJenis()) && t.getTanggal() != null && t.getJumlah() != null) {
+                if (YearMonth.from(t.getTanggal()).equals(sekarang)) {
+                    total = total.add(t.getJumlah());
+                }
+            }
+        }
+        return total;
     }
 
     public void diagramUang(User user, Model model) {

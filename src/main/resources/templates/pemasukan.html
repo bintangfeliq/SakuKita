@@ -51,36 +51,10 @@
                         <div class="kotak-info-sambutan">
                             <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                                 <span class="teks-info-sambutan text-uppercase">Total Pemasukan</span>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm text-white border border-white-50 rounded-pill px-3 py-1 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.8rem; background: rgba(255, 255, 255, 0.08);">
-                                        <i class="bx bx-calendar"></i>
-                                        <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua' : 'Bulan Ini')}">Bulan Ini</span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; min-width: 140px;">
-                                        <li>
-                                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'bulan' or periode == null} ? 'active' : ''" th:href="@{/pemasukan(periode='bulan')}">
-                                                <span>Bulan Ini</span>
-                                                <i th:if="${periode == 'bulan' or periode == null}" class="bx bx-check"></i>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'tahun'} ? 'active' : ''" th:href="@{/pemasukan(periode='tahun')}">
-                                                <span>Tahun Ini</span>
-                                                <i th:if="${periode == 'tahun'}" class="bx bx-check"></i>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-2 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'semua'} ? 'active' : ''" th:href="@{/pemasukan(periode='semua')}">
-                                                <span>Semua</span>
-                                                <i th:if="${periode == 'semua'}" class="bx bx-check"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
                             <h3 class="persen-info-sambutan font-judul fs-2 mb-1 text-white angka-tabel" th:text="'Rp ' + ${#numbers.formatDecimal(totalPemasukan != null ? totalPemasukan : 0, 0, 'POINT', 0, 'COMMA')}">Rp 0</h3>
-                            <span class="keterangan-info-sambutan" th:text="${periode == 'tahun' ? 'pemasukan tahun ini' : (periode == 'semua' ? 'seluruh pemasukan yang tercatat' : 'pemasukan bulan ini')}">
-                                pemasukan bulan ini
+                            <span class="keterangan-info-sambutan">
+                                Periode: <span th:text="${periodeJudul}">Januari 2024 - April 2026</span>
                             </span>
                         </div>
                     </div>
@@ -89,38 +63,12 @@
                 <div class="position-relative d-lg-none">
                     <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-2">
                         <span class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.06em;">TOTAL PEMASUKAN</span>
-                        <div class="dropdown">
-                            <button class="btn btn-sm text-white border border-white-50 rounded-pill px-2.5 py-0.5 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; background: rgba(255, 255, 255, 0.1);">
-                                <i class="bx bx-calendar"></i>
-                                <span th:text="${periode == 'tahun' ? 'Tahun Ini' : (periode == 'semua' ? 'Semua' : 'Bulan Ini')}">Bulan Ini</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; min-width: 130px;">
-                                <li>
-                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'bulan' or periode == null} ? 'active' : ''" th:href="@{/pemasukan(periode='bulan')}">
-                                        <span>Bulan Ini</span>
-                                        <i th:if="${periode == 'bulan' or periode == null}" class="bx bx-check"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'tahun'} ? 'active' : ''" th:href="@{/pemasukan(periode='tahun')}">
-                                        <span>Tahun Ini</span>
-                                        <i th:if="${periode == 'tahun'}" class="bx bx-check"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-1.5 px-3 small d-flex align-items-center justify-content-between" th:classappend="${periode == 'semua'} ? 'active' : ''" th:href="@{/pemasukan(periode='semua')}">
-                                        <span>Semua</span>
-                                        <i th:if="${periode == 'semua'}" class="bx bx-check"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                     <div class="fw-bold text-white angka-tabel mb-1" style="font-size: 1.45rem; line-height: 1.2;" th:text="'Rp ' + ${#numbers.formatDecimal(totalPemasukan != null ? totalPemasukan : 0, 0, 'POINT', 0, 'COMMA')}">
                         Rp 0
                     </div>
-                    <span class="text-white-50 d-block small mb-2.5" style="font-size: 0.72rem;" th:text="${periode == 'tahun' ? 'pemasukan tahun ini' : (periode == 'semua' ? 'seluruh pemasukan yang tercatat' : 'pemasukan bulan ini')}">
-                        pemasukan bulan ini
+                    <span class="text-white-50 d-block small mb-2.5" style="font-size: 0.72rem;">
+                        Periode: <span th:text="${periodeJudul}">Januari 2024 - April 2026</span>
                     </span>
 
                     <div class="pt-2 border-top-matte d-flex align-items-center gap-2">
@@ -145,32 +93,54 @@
             </div>
 
             <section class="card p-0 border shadow-none overflow-hidden" style="border-radius: 14px; border-color: #E2E8F0; background: #FFFFFF;">
-                <div class="p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="px-3 px-md-4 py-3 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="lingkaran-ikon-hijau flex-shrink-0" style="width: 28px; height: 28px; font-size: 0.95rem; border-radius: 7px;">
+                        <div class="lingkaran-ikon-hijau flex-shrink-0" style="width: 36px; height: 36px; font-size: 1.15rem; border-radius: 9px;">
                             <i class="bx bx-history"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-0 text-dark">Riwayat Pemasukan</h6>
-                            <small class="text-muted d-none d-sm-inline" style="font-size: 0.78rem;">Catatan mutasi pemasukan keuangan Anda</small>
-                        </div>
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.02rem;">Riwayat Pemasukan</h6>
                     </div>
+
+                    <!-- Filter di pojok kanan: ukuran proporsional & profesional -->
+                    <form th:action="@{/pemasukan}" method="get" class="d-flex align-items-center gap-2 ms-sm-auto">
+                        <select name="bulan" aria-label="Bulan" class="form-select form-select-sm" style="width: 130px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
+                            <option value="1" th:selected="${bulan == 1}">Januari</option>
+                            <option value="2" th:selected="${bulan == 2}">Februari</option>
+                            <option value="3" th:selected="${bulan == 3}">Maret</option>
+                            <option value="4" th:selected="${bulan == 4}">April</option>
+                            <option value="5" th:selected="${bulan == 5}">Mei</option>
+                            <option value="6" th:selected="${bulan == 6}">Juni</option>
+                            <option value="7" th:selected="${bulan == 7}">Juli</option>
+                            <option value="8" th:selected="${bulan == 8}">Agustus</option>
+                            <option value="9" th:selected="${bulan == 9}">September</option>
+                            <option value="10" th:selected="${bulan == 10}">Oktober</option>
+                            <option value="11" th:selected="${bulan == 11}">November</option>
+                            <option value="12" th:selected="${bulan == 12}">Desember</option>
+                        </select>
+                        <select name="tahun" aria-label="Tahun" class="form-select form-select-sm" style="width: 88px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
+                            <option th:each="t : ${daftarTahun}" th:value="${t}" th:text="${t}" th:selected="${t == tahun}">2026</option>
+                        </select>
+                        <button type="submit" class="tombol-utama small d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap flex-shrink-0" style="height: 36px; border-radius: 8px !important; font-size: 0.82rem; font-weight: 600; padding: 0 14px;">
+                            <i class="bx bx-filter-alt"></i>
+                            <span>Filter</span>
+                        </button>
+                    </form>
                 </div>
 
                 <div class="table-responsive text-nowrap">
                     <table class="table table-hover align-middle mb-0">
                         <thead style="background-color: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
                             <tr>
-                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Keterangan</th>
-                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Kategori</th>
-                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tanggal</th>
-                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Status</th>
-                                <th class="py-2.5 px-3 text-secondary fw-semibold text-uppercase text-end" style="font-size: 0.75rem; letter-spacing: 0.5px;">Nominal</th>
+                                <th class="py-3 px-3 px-md-4 text-secondary fw-semibold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.5px;">Keterangan</th>
+                                <th class="py-3 px-3 px-md-4 text-secondary fw-semibold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.5px;">Kategori</th>
+                                <th class="py-3 px-3 px-md-4 text-secondary fw-semibold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.5px;">Tanggal</th>
+                                <th class="py-3 px-3 px-md-4 text-secondary fw-semibold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.5px;">Status</th>
+                                <th class="py-3 px-3 px-md-4 text-secondary fw-semibold text-uppercase text-end" style="font-size: 0.78rem; letter-spacing: 0.5px;">Nominal</th>
                             </tr>
                         </thead>
                         <tbody class="border-top-0">
                             <tr th:each="p : ${transaksi}">
-                                <td class="py-2.5 px-3">
+                                <td class="py-3 px-3 px-md-4">
                                     <div class="d-flex align-items-center">
                                         <div class="lingkaran-ikon-kecil laporan-tabel-ikon flex-shrink-0 lingkaran-ikon-hijau">
                                             <i class="bx bx-up-arrow-alt"></i>
@@ -180,22 +150,22 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="py-2.5 px-3">
+                                <td class="py-3 px-3 px-md-4">
                                     <span class="badge border fw-medium px-2 py-0.5 text-secondary" style="background-color: #F8FAFC; border-color: #E2E8F0 !important; font-size: 0.75rem; border-radius: 6px;" th:text="${p.kategori != null and !#strings.isEmpty(p.kategori) ? p.kategori : 'Lainnya'}">
                                         Kategori
                                     </span>
                                 </td>
-                                <td class="py-2.5 px-3">
+                                <td class="py-3 px-3 px-md-4">
                                     <span class="text-muted small" style="font-size: 0.78rem;" th:text="${p.tanggal != null ? #temporals.format(p.tanggal, 'dd MMM yyyy, HH:mm') : '-'}">
                                         Tanggal
                                     </span>
                                 </td>
-                                <td class="py-2.5 px-3">
+                                <td class="py-3 px-3 px-md-4">
                                     <span class="badge fw-medium px-2 py-0.5" style="background-color: #E6F4EF; color: #0F3D32; font-size: 0.75rem; border-radius: 6px;">
                                         Pemasukan
                                     </span>
                                 </td>
-                                <td class="py-2.5 px-3 text-end fw-bold small text-success angka-tabel" th:text="'+ Rp ' + ${#numbers.formatDecimal(p.jumlah != null ? p.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">
+                                <td class="py-3 px-3 px-md-4 text-end fw-bold small text-success angka-tabel" th:text="'+ Rp ' + ${#numbers.formatDecimal(p.jumlah != null ? p.jumlah : 0, 0, 'POINT', 0, 'COMMA')}">
                                     + Rp 0
                                 </td>
                             </tr>
@@ -227,15 +197,15 @@
                     <nav aria-label="Navigasi Halaman" class="overflow-auto max-w-100">
                         <ul class="pagination pagination-sm mb-0 justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${currentPage - 1})}" aria-label="Sebelumnya" title="Sebelumnya">
+                                <a class="page-link" th:href="@{/pemasukan(bulan=${bulan}, tahun=${tahun}, page=${currentPage - 1})}" aria-label="Sebelumnya" title="Sebelumnya">
                                     <i class="bx bx-chevron-left fs-5"></i>
                                 </a>
                             </li>
                             <li th:each="i : ${#numbers.sequence(1, totalPages)}" class="page-item" th:classappend="${currentPage == i} ? 'active' : ''">
-                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${i})}" th:text="${i}">1</a>
+                                <a class="page-link" th:href="@{/pemasukan(bulan=${bulan}, tahun=${tahun}, page=${i})}" th:text="${i}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/pemasukan(periode=${periode}, page=${currentPage + 1})}" aria-label="Selanjutnya" title="Selanjutnya">
+                                <a class="page-link" th:href="@{/pemasukan(bulan=${bulan}, tahun=${tahun}, page=${currentPage + 1})}" aria-label="Selanjutnya" title="Selanjutnya">
                                     <i class="bx bx-chevron-right fs-5"></i>
                                 </a>
                             </li>

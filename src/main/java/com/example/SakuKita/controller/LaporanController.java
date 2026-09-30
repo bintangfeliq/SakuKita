@@ -1,5 +1,7 @@
 package com.example.SakuKita.controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -25,21 +27,43 @@ public class LaporanController {
         this.kategoriService = kategoriService;
     }
 
-   @GetMapping("/laporan")
-public String halamanLaporan( @RequestParam(defaultValue = "bulan") String periode, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
-    User user = (User) session.getAttribute("user");
-    if (user == null) {
-        return "redirect:/login";
-    }
-    List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
-    List<Transaksi> filteredTx = transaksiService.filterTransaksi(userTx, periode);
-    int pageSize = 10;
-    int totalItems = filteredTx.size();
-    int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));
-    page = Math.max(1, Math.min(page, totalPages));
-    int fromIndex = (page - 1) * pageSize;
-    int toIndex = Math.min(fromIndex + pageSize, totalItems);
-    List<Transaksi> pagedTx = filteredTx.subList(fromIndex, toIndex);
+    @GetMapping("/laporan")
+    public String halamanLaporan(
+            @RequestParam(required = false) Integer bulan,
+            @RequestParam(required = false) Integer tahun,
+            @RequestParam(defaultValue = "1") int page,
+            HttpSession session,
+            Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        LocalDate hariIni = LocalDate.now();
+        int bulanPilih = (bulan != null && bulan >= 1 && bulan <= 12) ? bulan : hariIni.getMonthValue();
+        int tahunPilih = (tahun != null && tahun >= 1900 && tahun <= 2100) ? tahun : hariIni.getYear();
+        List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
+        List<Transaksi> filteredTx = transaksiService.filterTransaksiRentang(userTx, bulanPilih, tahunPilih);
+        BigDecimal totalPemasukan = BigDecimal.ZERO;
+        BigDecimal totalPengeluaran = BigDecimal.ZERO;
+        for (Transaksi t : filteredTx) {
+            if ("PEMASUKAN".equalsIgnoreCase(t.getJenis()) && t.getJumlah() != null) {
+                totalPemasukan = totalPemasukan.add(t.getJumlah());
+            } else if ("PENGELUARAN".equalsIgnoreCase(t.getJenis()) && t.getJumlah() != null) {
+                totalPengeluaran = totalPengeluaran.add(t.getJumlah());
+            }
+        }
+
+        String periodeJudul = transaksiService.buatTeksPeriode(userTx, bulanPilih, tahunPilih);
+        List<Integer> daftarTahun = transaksiService.buatDaftarTahun(userTx, tahunPilih);
+
+        int pageSize = 10;
+        int totalItems = filteredTx.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));
+        page = Math.max(1, Math.min(page, totalPages));
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalItems);
+        List<Transaksi> pagedTx = filteredTx.subList(fromIndex, toIndex);
 
         model.addAttribute("transaksi", pagedTx);
         model.addAttribute("currentPage", page);
@@ -47,9 +71,12 @@ public String halamanLaporan( @RequestParam(defaultValue = "bulan") String perio
         model.addAttribute("totalItems", totalItems);
         model.addAttribute("fromIndex", totalItems == 0 ? 0 : fromIndex + 1);
         model.addAttribute("toIndex", toIndex);
-        model.addAttribute("totalPemasukan", transaksiService.totalPemasukan(user, periode));
-        model.addAttribute("totalPengeluaran", transaksiService.totalPengeluaran(user, periode));
-        model.addAttribute("periode", periode);
+        model.addAttribute("totalPemasukan", totalPemasukan);
+        model.addAttribute("totalPengeluaran", totalPengeluaran);
+        model.addAttribute("bulan", bulanPilih);
+        model.addAttribute("tahun", tahunPilih);
+        model.addAttribute("daftarTahun", daftarTahun);
+        model.addAttribute("periodeJudul", periodeJudul);
         transaksiService.diagramUang(user, model);
         kategoriService.muatAlokasiKategori(user, filteredTx, model);
         return "laporan";

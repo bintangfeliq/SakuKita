@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,23 +24,17 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class PengeluaranController {
 
-    private final TransaksiService transaksiService;
-    private final KategoriService kategoriService;
-    private final TemplateTransaksiService templateTransaksiService;
+    @Autowired
+    private TransaksiService transaksiService;
 
-    public PengeluaranController(TransaksiService transaksiService, KategoriService kategoriService, TemplateTransaksiService templateTransaksiService) {
-        this.transaksiService = transaksiService;
-        this.kategoriService = kategoriService;
-        this.templateTransaksiService = templateTransaksiService;
-    }
+    @Autowired
+    private KategoriService kategoriService;
+
+    @Autowired
+    private TemplateTransaksiService templateTransaksiService;
 
     @GetMapping("/pengeluaran")
-    public String halamanPengeluaran(
-            @RequestParam(required = false) Integer bulan,
-            @RequestParam(required = false) Integer tahun,
-            @RequestParam(defaultValue = "1") int page,
-            HttpSession session,
-            Model model) {
+    public String halamanPengeluaran(@RequestParam(required = false) Integer bulan, @RequestParam(required = false) Integer tahun, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -48,19 +43,16 @@ public class PengeluaranController {
         LocalDate hariIni = LocalDate.now();
         int bulanPilih = (bulan != null && bulan >= 1 && bulan <= 12) ? bulan : hariIni.getMonthValue();
         int tahunPilih = (tahun != null && tahun >= 1900 && tahun <= 2100) ? tahun : hariIni.getYear();
-
         List<Transaksi> semuaPengeluaran = new ArrayList<>();
         for (Transaksi t : transaksiService.cariTransaksiUser(user)) {
             if ("PENGELUARAN".equalsIgnoreCase(t.getJenis())) {
                 semuaPengeluaran.add(t);
             }
         }
-
-        List<Transaksi> filtered = transaksiService.filterTransaksiRentang(semuaPengeluaran, bulanPilih, tahunPilih);
+        List<Transaksi> filtered = transaksiService.filterTransaksiBulan(semuaPengeluaran, bulanPilih, tahunPilih);
         BigDecimal totalPengeluaran = transaksiService.totalNominal(filtered);
-        String periodeJudul = transaksiService.buatTeksPeriode(semuaPengeluaran, bulanPilih, tahunPilih);
+        String periodeJudul = transaksiService.buatTeksPeriode(bulanPilih, tahunPilih);
         List<Integer> daftarTahun = transaksiService.buatDaftarTahun(semuaPengeluaran, tahunPilih);
-
         int pageSize = 10;
         int totalItems = filtered.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));

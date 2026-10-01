@@ -26,8 +26,6 @@
                     <h2 class="h4 fw-bold text-dark mb-1 laporan-judul">Laporan Keuangan</h2>
                     <p class="text-muted small mb-0 d-none d-sm-block" style="font-size: 0.82rem;">Ringkasan arus kas pemasukan dan pengeluaran akun Anda</p>
                 </div>
-
-                <!-- Filter Laporan Sejajar dengan Title (Tanpa Card) -->
                 <form th:action="@{/laporan}" method="get" class="d-flex align-items-center gap-2 ms-sm-auto mb-0">
                     <select name="bulan" aria-label="Bulan" class="form-select form-select-sm shadow-none" style="width: 130px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
                         <option value="1" th:selected="${bulan == 1}">Januari</option>

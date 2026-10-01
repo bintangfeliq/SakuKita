@@ -2,6 +2,7 @@ package com.example.SakuKita.service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +14,8 @@ import com.example.SakuKita.repository.SaldoRepository;
 @Transactional
 public class SaldoService {
 
-    private final SaldoRepository saldoRepository;
-
-    public SaldoService(SaldoRepository saldoRepository) {
-        this.saldoRepository = saldoRepository;
-    }
+    @Autowired
+    private SaldoRepository saldoRepository;
 
     public Saldo saldoAwal(User user) {
         Saldo saldo = new Saldo();

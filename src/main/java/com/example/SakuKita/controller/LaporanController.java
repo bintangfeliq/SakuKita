@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,21 +20,14 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class LaporanController {
 
-    private final TransaksiService transaksiService;
-    private final KategoriService kategoriService;
+    @Autowired
+    private TransaksiService transaksiService;
 
-    public LaporanController(TransaksiService transaksiService, KategoriService kategoriService) {
-        this.transaksiService = transaksiService;
-        this.kategoriService = kategoriService;
-    }
+    @Autowired
+    private KategoriService kategoriService;
 
     @GetMapping("/laporan")
-    public String halamanLaporan(
-            @RequestParam(required = false) Integer bulan,
-            @RequestParam(required = false) Integer tahun,
-            @RequestParam(defaultValue = "1") int page,
-            HttpSession session,
-            Model model) {
+    public String halamanLaporan( @RequestParam(required = false) Integer bulan, @RequestParam(required = false) Integer tahun, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -43,7 +37,7 @@ public class LaporanController {
         int bulanPilih = (bulan != null && bulan >= 1 && bulan <= 12) ? bulan : hariIni.getMonthValue();
         int tahunPilih = (tahun != null && tahun >= 1900 && tahun <= 2100) ? tahun : hariIni.getYear();
         List<Transaksi> userTx = transaksiService.cariTransaksiUser(user);
-        List<Transaksi> filteredTx = transaksiService.filterTransaksiRentang(userTx, bulanPilih, tahunPilih);
+        List<Transaksi> filteredTx = transaksiService.filterTransaksiBulan(userTx, bulanPilih, tahunPilih);
         BigDecimal totalPemasukan = BigDecimal.ZERO;
         BigDecimal totalPengeluaran = BigDecimal.ZERO;
         for (Transaksi t : filteredTx) {
@@ -54,8 +48,8 @@ public class LaporanController {
             }
         }
 
-        String periodeJudul = transaksiService.buatTeksPeriode(userTx, bulanPilih, tahunPilih);
-        List<Integer> daftarTahun = transaksiService.buatDaftarTahun(userTx, tahunPilih);
+        String periodeJudul = transaksiService.buatTeksPeriode(bulanPilih, tahunPilih);
+        List<Integer> daftarTahun = transaksiService.buatDaftarTahun();
 
         int pageSize = 10;
         int totalItems = filteredTx.size();

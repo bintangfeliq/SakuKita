@@ -103,7 +103,6 @@
                         <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.02rem;">Riwayat Pengeluaran</h6>
                     </div>
 
-                    <!-- Filter di pojok kanan: ukuran proporsional & profesional -->
                     <form th:action="@{/pengeluaran}" method="get" class="d-flex align-items-center gap-2 ms-sm-auto">
                         <select name="bulan" aria-label="Bulan" class="form-select form-select-sm" style="width: 130px; height: 36px; border-radius: 8px; font-size: 0.82rem; border-color: #CBD5E1; color: #1E293B; font-weight: 500; background-color: #FFFFFF;">
                             <option value="1" th:selected="${bulan == 1}">Januari</option>

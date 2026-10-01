@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -19,17 +20,13 @@ import com.example.SakuKita.repository.KategoriRepository;
 @Transactional
 public class KategoriService {
 
-    private final KategoriRepository kategoriRepository;
-
-    public KategoriService(KategoriRepository kategoriRepository) {
-        this.kategoriRepository = kategoriRepository;
-    }
+    @Autowired
+    private KategoriRepository kategoriRepository;
 
     public List<Kategori> cariKategoriUser(User user) {
         if (user == null) {
             return List.of();
         }
-
         return kategoriRepository.findByUserOrderByIdDesc(user);
     }
     public Kategori tambahKategori(User user, String nama) {
@@ -77,13 +74,11 @@ public class KategoriService {
             Kategori kategori = kategoriUser.get(i);
             BigDecimal total = BigDecimal.ZERO;
             if (transaksi != null) {
-                total = transaksi.stream()
-                        .filter(t -> t.getJumlah() != null)
-                        .filter(t -> t.getKategori() != null)
-                        .filter(t -> t.getKategori()
-                        .equalsIgnoreCase(kategori.getNama()))
-                        .map(t -> t.getJumlah())
-                        .reduce(BigDecimal.ZERO, (hasil, jumlah) -> hasil.add(jumlah));
+                for (Transaksi t : transaksi) {
+                    if (t.getJumlah() != null && t.getKategori() != null && t.getKategori().equalsIgnoreCase(kategori.getNama())) {
+                        total = total.add(t.getJumlah());
+                    }
+                }
             }
             
             String warnaKategori = warna.get(i % warna.size());

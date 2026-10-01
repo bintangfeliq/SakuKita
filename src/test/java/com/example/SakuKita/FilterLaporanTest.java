@@ -3,7 +3,6 @@ package com.example.SakuKita;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -57,10 +56,6 @@ class FilterLaporanTest {
     void testFilterRentang_TransaksiAwalSampaiBulanTahunPilihan() {
         User user = userService.tambahUser(new User(null, "User Filter", "filter_rentang_" + System.currentTimeMillis() + "@test.com", "pass123"));
 
-        // Buat 3 transaksi pemasukan dengan tanggal berbeda:
-        // 1. 15 Januari 2024
-        // 2. 10 Mei 2025
-        // 3. 20 Juli 2026
         Transaksi t1 = new Transaksi(null, "PEMASUKAN", new BigDecimal("100000"), "Gaji Awal", LocalDateTime.of(2024, 1, 15, 10, 0), "Gaji", user);
         Transaksi t2 = new Transaksi(null, "PEMASUKAN", new BigDecimal("200000"), "Bonus Tengah", LocalDateTime.of(2025, 5, 10, 11, 0), "Bonus", user);
         Transaksi t3 = new Transaksi(null, "PEMASUKAN", new BigDecimal("300000"), "Proyek Depan", LocalDateTime.of(2026, 7, 20, 14, 0), "Proyek", user);
@@ -68,24 +63,17 @@ class FilterLaporanTest {
 
         List<Transaksi> semua = transaksiService.cariTransaksiUser(user);
 
-        // Jika user memilih Bulan = April, Tahun = 2026
-        // Rentang laporan: Januari 2024 s/d April 2026
-        // Transaksi 1 (Jan 2024) dan 2 (Mei 2025) harus masuk, sedangkan transaksi 3 (Juli 2026) tidak masuk
-        List<Transaksi> hasil = transaksiService.filterTransaksiRentang(semua, 4, 2026);
-        assertEquals(2, hasil.size());
+        List<Transaksi> hasil = transaksiService.filterTransaksiBulan(semua, 1, 2024);
+        assertEquals(1, hasil.size());
 
-        // Cek total nominal
         BigDecimal total = transaksiService.totalNominal(hasil);
-        assertEquals(new BigDecimal("300000"), total);
+        assertEquals(new BigDecimal("100000"), total);
 
-        // Cek teks periode
-        String periode = transaksiService.buatTeksPeriode(semua, 4, 2026);
-        assertEquals("Januari 2024 - April 2026", periode);
+        String periode = transaksiService.buatTeksPeriode(1, 2024);
+        assertEquals("Januari 2024", periode);
 
-        // Cek daftar tahun
         List<Integer> daftarTahun = transaksiService.buatDaftarTahun(semua, 2026);
-        assertTrue(daftarTahun.contains(2024));
-        assertTrue(daftarTahun.contains(2025));
+        assertEquals(5, daftarTahun.size());
         assertTrue(daftarTahun.contains(2026));
     }
 
@@ -93,17 +81,15 @@ class FilterLaporanTest {
     void testFilterRentang_PilihanSebelumTransaksiAwal_HasilKosong() {
         User user = userService.tambahUser(new User(null, "User Sebelum Awal", "sebelum_awal_" + System.currentTimeMillis() + "@test.com", "pass123"));
 
-        // Transaksi pertama Maret 2025
         Transaksi t1 = new Transaksi(null, "PEMASUKAN", new BigDecimal("500000"), "Gaji Maret", LocalDateTime.of(2025, 3, 1, 9, 0), "Gaji", user);
         transaksiRepository.save(t1);
 
         List<Transaksi> semua = transaksiService.cariTransaksiUser(user);
 
-        // User memilih Januari 2025 (sebelum transaksi pertama)
-        List<Transaksi> hasil = transaksiService.filterTransaksiRentang(semua, 1, 2025);
-        assertTrue(hasil.isEmpty(), "Jika pilihan sebelum transaksi awal, hasil harus kosong");
+        List<Transaksi> hasil = transaksiService.filterTransaksiBulan(semua, 1, 2025);
+        assertTrue(hasil.isEmpty());
 
-        String periode = transaksiService.buatTeksPeriode(semua, 1, 2025);
+        String periode = transaksiService.buatTeksPeriode(1, 2025);
         assertEquals("Januari 2025", periode);
     }
 
@@ -112,17 +98,18 @@ class FilterLaporanTest {
         User user = userService.tambahUser(new User(null, "User Baru Nol", "user_nol_" + System.currentTimeMillis() + "@test.com", "pass123"));
         List<Transaksi> semua = transaksiService.cariTransaksiUser(user);
 
-        List<Transaksi> hasil = transaksiService.filterTransaksiRentang(semua, 4, 2026);
+        List<Transaksi> hasil = transaksiService.filterTransaksiBulan(semua, 4, 2026);
         assertTrue(hasil.isEmpty());
 
         BigDecimal total = transaksiService.totalNominal(hasil);
         assertEquals(BigDecimal.ZERO, total);
 
-        String periode = transaksiService.buatTeksPeriode(semua, 4, 2026);
+        String periode = transaksiService.buatTeksPeriode(4, 2026);
         assertEquals("April 2026", periode);
 
         List<Integer> daftarTahun = transaksiService.buatDaftarTahun(semua, 2026);
         assertFalse(daftarTahun.isEmpty());
+        assertEquals(5, daftarTahun.size());
     }
 
     @Test
@@ -133,46 +120,42 @@ class FilterLaporanTest {
         Transaksi tKeluar = new Transaksi(null, "PENGELUARAN", new BigDecimal("500000"), "Pengeluaran Uji", LocalDateTime.of(2024, 3, 15, 11, 0), "Operasional", user);
         transaksiRepository.saveAll(List.of(tMasuk, tKeluar));
 
-        // Test GET /pemasukan dengan param bulan dan tahun
         mockMvc.perform(get("/pemasukan")
                 .sessionAttr("user", user)
-                .param("bulan", "4")
-                .param("tahun", "2026"))
+                .param("bulan", "2")
+                .param("tahun", "2024"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pemasukan"))
-                .andExpect(model().attribute("bulan", 4))
-                .andExpect(model().attribute("tahun", 2026))
+                .andExpect(model().attribute("bulan", 2))
+                .andExpect(model().attribute("tahun", 2024))
                 .andExpect(model().attributeExists("daftarTahun", "periodeJudul"))
                 .andExpect(content().string(containsString("Riwayat Pemasukan")))
                 .andExpect(content().string(containsString("Pemasukan Uji")))
                 .andExpect(content().string(containsString("1.500.000")));
 
-        // Test GET /pengeluaran dengan param bulan dan tahun
         mockMvc.perform(get("/pengeluaran")
                 .sessionAttr("user", user)
-                .param("bulan", "4")
-                .param("tahun", "2026"))
+                .param("bulan", "3")
+                .param("tahun", "2024"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pengeluaran"))
-                .andExpect(model().attribute("bulan", 4))
-                .andExpect(model().attribute("tahun", 2026))
+                .andExpect(model().attribute("bulan", 3))
+                .andExpect(model().attribute("tahun", 2024))
                 .andExpect(model().attributeExists("daftarTahun", "periodeJudul"))
                 .andExpect(content().string(containsString("Riwayat Pengeluaran")))
                 .andExpect(content().string(containsString("Pengeluaran Uji")))
                 .andExpect(content().string(containsString("500.000")));
 
-        // Test GET /laporan dengan param bulan dan tahun
         mockMvc.perform(get("/laporan")
                 .sessionAttr("user", user)
-                .param("bulan", "4")
-                .param("tahun", "2026"))
+                .param("bulan", "2")
+                .param("tahun", "2024"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("laporan"))
-                .andExpect(model().attribute("bulan", 4))
-                .andExpect(model().attribute("tahun", 2026))
+                .andExpect(model().attribute("bulan", 2))
+                .andExpect(model().attribute("tahun", 2024))
                 .andExpect(model().attributeExists("daftarTahun", "periodeJudul"))
-                .andExpect(content().string(containsString("Filter Laporan")))
-                .andExpect(content().string(containsString("1.500.000")))
-                .andExpect(content().string(containsString("500.000")));
+                .andExpect(content().string(containsString("Laporan Keuangan")))
+                .andExpect(content().string(containsString("1.500.000")));
     }
 }

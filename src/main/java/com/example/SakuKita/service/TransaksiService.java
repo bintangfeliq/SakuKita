@@ -7,6 +7,7 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -19,13 +20,11 @@ import com.example.SakuKita.repository.TransaksiRepository;
 @Transactional
 public class TransaksiService {
 
-    private final TransaksiRepository transaksiRepository;
-    private final SaldoService saldoService;
+    @Autowired
+    private TransaksiRepository transaksiRepository;
 
-    public TransaksiService(TransaksiRepository transaksiRepository, SaldoService saldoService) {
-        this.transaksiRepository = transaksiRepository;
-        this.saldoService = saldoService;
-    }
+    @Autowired
+    private SaldoService saldoService;
 
     public Transaksi simpan(User user, BigDecimal jumlah, String keterangan, String kategori, String jenis) {
         Transaksi transaksi = new Transaksi();
@@ -38,14 +37,14 @@ public class TransaksiService {
         return transaksiRepository.save(transaksi);
     }
 
-    public Transaksi pemasukan( User user, BigDecimal jumlah, String keterangan, String kategori) {
+    public Transaksi pemasukan(User user, BigDecimal jumlah, String keterangan, String kategori) {
         saldoService.tambahSaldo(user, jumlah);
-        return simpan( user, jumlah, keterangan, kategori, "PEMASUKAN");
+        return simpan(user, jumlah, keterangan, kategori, "PEMASUKAN");
     }
 
     public Transaksi pengeluaran(User user, BigDecimal jumlah, String keterangan, String kategori) {
         saldoService.kurangiSaldo(user, jumlah);
-        return simpan( user, jumlah, keterangan, kategori, "PENGELUARAN");
+        return simpan(user, jumlah, keterangan, kategori, "PENGELUARAN");
     }
 
     public List<Transaksi> cariTransaksiUser(User user) {
@@ -62,85 +61,49 @@ public class TransaksiService {
         return transaksiRepository.findTop5ByUserOrderByTanggalDescIdDesc(user);
     }
 
-    public LocalDateTime cariTanggalTransaksiAwal(List<Transaksi> transaksi) {
-        if (transaksi == null || transaksi.isEmpty()) {
-            return null;
-        }
-        LocalDateTime tanggalAwal = null;
-        for (Transaksi t : transaksi) {
-            if (t.getTanggal() != null) {
-                if (tanggalAwal == null || t.getTanggal().isBefore(tanggalAwal)) {
-                    tanggalAwal = t.getTanggal();
-                }
-            }
-        }
-        return tanggalAwal;
-    }
-
-    public List<Transaksi> filterTransaksiRentang(List<Transaksi> transaksi, int bulan, int tahun) {
+    public List<Transaksi> filterTransaksiBulan(List<Transaksi> transaksi, int bulan, int tahun) {
         if (transaksi == null || transaksi.isEmpty()) {
             return List.of();
         }
-
-        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
-        if (tanggalAwal == null) {
-            return List.of();
-        }
-        LocalDate startDate = LocalDate.of(tanggalAwal.getYear(), tanggalAwal.getMonthValue(), 1);
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        YearMonth yearMonth = YearMonth.of(tahun, bulan);
-        LocalDate endDate = yearMonth.atEndOfMonth();
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59, 999999999);
-        if (endDate.isBefore(startDate)) {
-            return List.of();
-        }
-
         List<Transaksi> hasil = new ArrayList<>();
         for (Transaksi t : transaksi) {
-            if (t.getTanggal() != null) {
-                if (!t.getTanggal().isBefore(startDateTime) && !t.getTanggal().isAfter(endDateTime)) {
-                    hasil.add(t);
-                }
+            if (t.getTanggal() != null && t.getTanggal().getMonthValue() == bulan && t.getTanggal().getYear() == tahun) {
+                hasil.add(t);
             }
         }
         return hasil;
     }
 
-    public String buatTeksPeriode(List<Transaksi> transaksi, int bulan, int tahun) {
+    public List<Transaksi> filterTransaksiRentang(List<Transaksi> transaksi, int bulan, int tahun) {
+        return filterTransaksiBulan(transaksi, bulan, tahun);
+    }
+
+    public String buatTeksPeriode(int bulan, int tahun) {
         String[] namaBulan = {
             "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
             "Juli", "Agustus", "September", "Oktober", "November", "Desember"
         };
+        return namaBulan[bulan] + " " + tahun;
+    }
 
-        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
-        if (tanggalAwal == null) {
-            return namaBulan[bulan] + " " + tahun;
+    public String buatTeksPeriode(List<Transaksi> transaksi, int bulan, int tahun) {
+        return buatTeksPeriode(bulan, tahun);
+    }
+
+    public List<Integer> buatDaftarTahun() {
+        int tahunSekarang = LocalDate.now().getYear();
+        List<Integer> daftarTahun = new ArrayList<>();
+        for (int y = tahunSekarang - 4; y <= tahunSekarang; y++) {
+            daftarTahun.add(y);
         }
-
-        LocalDate startDate = LocalDate.of(tanggalAwal.getYear(), tanggalAwal.getMonthValue(), 1);
-        YearMonth yearMonth = YearMonth.of(tahun, bulan);
-        LocalDate endDate = yearMonth.atEndOfMonth();
-
-        if (endDate.isBefore(startDate)) {
-            return namaBulan[bulan] + " " + tahun;
-        }
-
-        return namaBulan[startDate.getMonthValue()] + " " + startDate.getYear() + " - " + namaBulan[bulan] + " " + tahun;
+        return daftarTahun;
     }
 
     public List<Integer> buatDaftarTahun(List<Transaksi> transaksi, int tahunPilihan) {
-        int tahunSekarang = LocalDate.now().getYear();
-        int tahunAwal = tahunSekarang;
-
-        LocalDateTime tanggalAwal = cariTanggalTransaksiAwal(transaksi);
-        if (tanggalAwal != null && tanggalAwal.getYear() < tahunAwal) {
-            tahunAwal = tanggalAwal.getYear();
-        }
-
-        int tahunAkhir = Math.max(tahunSekarang, tahunPilihan);
-        List<Integer> daftarTahun = new ArrayList<>();
-        for (int y = tahunAwal; y <= tahunAkhir; y++) {
-            daftarTahun.add(y);
+        List<Integer> daftarTahun = buatDaftarTahun();
+        if (tahunPilihan > 0 && !daftarTahun.contains(tahunPilihan)) {
+            daftarTahun.add(tahunPilihan);
+            daftarTahun.sort(null);
         }
         return daftarTahun;
     }
@@ -211,7 +174,6 @@ public class TransaksiService {
                 }
                 if ("PEMASUKAN".equalsIgnoreCase(t.getJenis())) {
                     totalMasuk = totalMasuk.add(t.getJumlah());
-
                 } else if ("PENGELUARAN".equalsIgnoreCase(t.getJenis())) {
                     totalKeluar = totalKeluar.add(t.getJumlah());
                 }

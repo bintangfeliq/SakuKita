@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,32 +24,24 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class PemasukanController {
 
-    private final TransaksiService transaksiService;
-    private final KategoriService kategoriService;
-    private final TemplateTransaksiService templateTransaksiService;
+    @Autowired
+    private TransaksiService transaksiService;
 
-    public PemasukanController(TransaksiService transaksiService, KategoriService kategoriService, TemplateTransaksiService templateTransaksiService) {
-        this.transaksiService = transaksiService;
-        this.kategoriService = kategoriService;
-        this.templateTransaksiService = templateTransaksiService;
-    }
+    @Autowired
+    private KategoriService kategoriService;
+
+    @Autowired
+    private TemplateTransaksiService templateTransaksiService;
 
     @GetMapping("/pemasukan")
-    public String halamanPemasukan(
-            @RequestParam(required = false) Integer bulan,
-            @RequestParam(required = false) Integer tahun,
-            @RequestParam(defaultValue = "1") int page,
-            HttpSession session,
-            Model model) {
+    public String halamanPemasukan(@RequestParam(required = false) Integer bulan, @RequestParam(required = false) Integer tahun, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
-
         LocalDate hariIni = LocalDate.now();
         int bulanPilih = (bulan != null && bulan >= 1 && bulan <= 12) ? bulan : hariIni.getMonthValue();
         int tahunPilih = (tahun != null && tahun >= 1900 && tahun <= 2100) ? tahun : hariIni.getYear();
-
         List<Transaksi> semuaPemasukan = new ArrayList<>();
         for (Transaksi t : transaksiService.cariTransaksiUser(user)) {
             if ("PEMASUKAN".equalsIgnoreCase(t.getJenis())) {
@@ -56,11 +49,10 @@ public class PemasukanController {
             }
         }
 
-        List<Transaksi> filtered = transaksiService.filterTransaksiRentang(semuaPemasukan, bulanPilih, tahunPilih);
+        List<Transaksi> filtered = transaksiService.filterTransaksiBulan(semuaPemasukan, bulanPilih, tahunPilih);
         BigDecimal totalPemasukan = transaksiService.totalNominal(filtered);
-        String periodeJudul = transaksiService.buatTeksPeriode(semuaPemasukan, bulanPilih, tahunPilih);
-        List<Integer> daftarTahun = transaksiService.buatDaftarTahun(semuaPemasukan, tahunPilih);
-
+        String periodeJudul = transaksiService.buatTeksPeriode(bulanPilih, tahunPilih);
+        List<Integer> daftarTahun = transaksiService.buatDaftarTahun();
         int pageSize = 10;
         int totalItems = filtered.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / pageSize));

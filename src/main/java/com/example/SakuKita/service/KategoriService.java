@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -20,8 +19,11 @@ import com.example.SakuKita.repository.KategoriRepository;
 @Transactional
 public class KategoriService {
 
-    @Autowired
-    private KategoriRepository kategoriRepository;
+    private final KategoriRepository kategoriRepository;
+
+    public KategoriService(KategoriRepository kategoriRepository) {
+        this.kategoriRepository = kategoriRepository;
+    }
 
     public List<Kategori> cariKategoriUser(User user) {
         if (user == null) {

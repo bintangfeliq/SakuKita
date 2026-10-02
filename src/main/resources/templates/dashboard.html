@@ -36,9 +36,6 @@
                                         Halo, <span class="nama-user-salam"
                                             th:text="${user != null and user.name != null and !#strings.isEmpty(user.name) ? user.name : (session.user != null and session.user.name != null and !#strings.isEmpty(session.user.name) ? session.user.name : 'Sobat SakuKita')}">User</span>
                                     </h2>
-                                    <p class="text-muted small mb-0 deskripsi-salam-dashboard">
-                                        Selamat datang! Kelola pemasukan, pantau pengeluaran.
-                                    </p>
                                 </div>
                                 <a th:href="@{/logout}" class="tombol-logout-header" title="Keluar dari Akun"
                                     aria-label="Logout">

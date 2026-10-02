@@ -1,6 +1,5 @@
 package com.example.SakuKita.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,16 +11,9 @@ import com.example.SakuKita.repository.UserRepository;
 @Transactional
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SaldoService saldoService;
-
-    private BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-
-    public UserService() {
-    }
+    private final UserRepository userRepository;
+    private final SaldoService saldoService;
+    private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 
     public UserService(UserRepository userRepository, SaldoService saldoService) {
         this.userRepository = userRepository;

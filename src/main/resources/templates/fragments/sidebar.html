@@ -154,6 +154,54 @@
                     });
                 }
             })();
+
+            document.addEventListener('submit', function (e) {
+                if (e.defaultPrevented) return;
+                var form = e.target;
+                if (form.getAttribute('data-submitting') === 'true') {
+                    e.preventDefault();
+                    return;
+                }
+                if (form.checkValidity && !form.checkValidity()) {
+                    return;
+                }
+                form.setAttribute('data-submitting', 'true');
+                var tombol = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                for (var i = 0; i < tombol.length; i++) {
+                    tombol[i].disabled = true;
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    var form = e.target.form || (e.target.closest && e.target.closest('form'));
+                    if (form && form.getAttribute('data-submitting') === 'true') {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            document.addEventListener('hidden.bs.modal', function (e) {
+                var forms = e.target.querySelectorAll('form');
+                for (var i = 0; i < forms.length; i++) {
+                    forms[i].removeAttribute('data-submitting');
+                    var tombol = forms[i].querySelectorAll('button[type="submit"], input[type="submit"]');
+                    for (var j = 0; j < tombol.length; j++) {
+                        tombol[j].disabled = false;
+                    }
+                }
+            });
+
+            window.addEventListener('pageshow', function () {
+                var forms = document.querySelectorAll('form');
+                for (var i = 0; i < forms.length; i++) {
+                    forms[i].removeAttribute('data-submitting');
+                    var tombol = forms[i].querySelectorAll('button[type="submit"], input[type="submit"]');
+                    for (var j = 0; j < tombol.length; j++) {
+                        tombol[j].disabled = false;
+                    }
+                }
+            });
         </script>
     </th:block>
 </body>

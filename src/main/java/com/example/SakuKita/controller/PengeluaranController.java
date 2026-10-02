@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,14 +23,15 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class PengeluaranController {
 
-    @Autowired
-    private TransaksiService transaksiService;
+    private final TransaksiService transaksiService;
+    private final KategoriService kategoriService;
+    private final TemplateTransaksiService templateTransaksiService;
 
-    @Autowired
-    private KategoriService kategoriService;
-
-    @Autowired
-    private TemplateTransaksiService templateTransaksiService;
+    public PengeluaranController(TransaksiService transaksiService, KategoriService kategoriService, TemplateTransaksiService templateTransaksiService) {
+        this.transaksiService = transaksiService;
+        this.kategoriService = kategoriService;
+        this.templateTransaksiService = templateTransaksiService;
+    }
 
     @GetMapping("/pengeluaran")
     public String halamanPengeluaran(@RequestParam(required = false) Integer bulan, @RequestParam(required = false) Integer tahun, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {

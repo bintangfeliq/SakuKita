@@ -2,7 +2,6 @@ package com.example.SakuKita.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +21,11 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class KategoriController {
 
-    @Autowired
-    private KategoriService kategoriService;
+    private final KategoriService kategoriService;
+
+    public KategoriController(KategoriService kategoriService) {
+        this.kategoriService = kategoriService;
+    }
 
     @GetMapping
     public String kategori(@RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {

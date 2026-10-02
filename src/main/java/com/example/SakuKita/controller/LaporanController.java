@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +19,13 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class LaporanController {
 
-    @Autowired
-    private TransaksiService transaksiService;
+    private final TransaksiService transaksiService;
+    private final KategoriService kategoriService;
 
-    @Autowired
-    private KategoriService kategoriService;
+    public LaporanController(TransaksiService transaksiService, KategoriService kategoriService) {
+        this.transaksiService = transaksiService;
+        this.kategoriService = kategoriService;
+    }
 
     @GetMapping("/laporan")
     public String halamanLaporan( @RequestParam(required = false) Integer bulan, @RequestParam(required = false) Integer tahun, @RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {

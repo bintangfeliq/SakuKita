@@ -7,7 +7,6 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -20,11 +19,13 @@ import com.example.SakuKita.repository.TransaksiRepository;
 @Transactional
 public class TransaksiService {
 
-    @Autowired
-    private TransaksiRepository transaksiRepository;
+    private final TransaksiRepository transaksiRepository;
+    private final SaldoService saldoService;
 
-    @Autowired
-    private SaldoService saldoService;
+    public TransaksiService(TransaksiRepository transaksiRepository, SaldoService saldoService) {
+        this.transaksiRepository = transaksiRepository;
+        this.saldoService = saldoService;
+    }
 
     public Transaksi simpan(User user, BigDecimal jumlah, String keterangan, String kategori, String jenis) {
         Transaksi transaksi = new Transaksi();
